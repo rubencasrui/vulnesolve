@@ -1,0 +1,74 @@
+<h1 class="text-center mb-4">Escaneo de red mediante NMap</h1>
+
+<h2 class="text-center mb-4">Ejemplos de escaneos de red:</h2>
+<div class="row justify-content-center">
+  <div class="col-auto">
+    <button class="btn btn-success m-1" (click)="ejemplo1()">Escaneo 1</button>
+    <button class="btn btn-success m-1" (click)="ejemplo2()">Escaneo 2</button>
+  </div>
+</div>
+
+<h2 class="text-center mb-4">Escanear mi archivo de red:</h2>
+<form (ngSubmit)="escanear()" #escanearForm="ngForm" class="mb-4">
+  <div class="form-group">
+    <div class="row justify-content-center">
+      <div class="col-auto align-content-center">
+        <label for="xml" class="form-label">Archivo XML de nmap:</label>
+      </div>
+      <div class="col-auto">
+        <input type="file" accept=".xml" class="form-control" id="xml" name="xml" (change)="getFile($event)" >
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary" [disabled]="!escanearForm.valid">Escanear</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="row">
+  <div class="col justify-content-center">
+    @if (escaneo.equipos.length > 0){
+      <h2 class="text-center mb-4">Topología de la red:</h2>
+    }
+    <figure></figure>
+    @if (escaneo.equipos.length > 0){
+      <h2 class="text-center mb-4">Equipos:</h2>
+      <div class="row justify-content-center">
+        <div class="col-auto">
+          @for (equipo of escaneo.equipos.sort(compareEquipos) | slice: 1 : escaneo.equipos.length; track $index){
+            <div class="card text-center mb-2">
+              <div class="card-body">
+                <h5 class="card-title">Equipo {{equipo.id}}</h5>
+                <p class="card-text">Dirección IP: {{equipo.ip}}</p>
+                @if (equipo.mac.length > 0){<p class="card-text">Dirección MAC: {{equipo.mac}}</p>}
+                <p class="card-text">Puertos abiertos: {{equipo.puertos.length}}</p>
+                @if (equipo.puertos.length > 0){
+                  <div class="row justify-content-center">
+                    <div class="col-auto">
+                      @for (puerto of equipo.puertos.sort(comparePuertos); track $index){
+                        <div class="card text-center mb-2">
+                          <div class="card-body">
+                            <h5 class="card-title">Puerto: {{puerto.numero}}</h5>
+                            <p class="card-text">Protocolo: {{puerto.nombre}}</p>
+                            @if (puerto.descripcion.length > 0){<p class="card-text">Descripción: {{puerto.descripcion}}</p>}
+                            <p class="card-text">Estado: {{puerto.estado}}</p>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+@if (show) {
+  <ngb-toast header="{{ titulo }}" [autohide]="true" (hidden)="show = false" [delay]="3000">
+    <pre>{{ mensaje }}</pre>
+  </ngb-toast>
+}

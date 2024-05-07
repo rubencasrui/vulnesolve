@@ -1,0 +1,21 @@
+ngb-toast {
+  position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 9999;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: ease-in-out 0.5s;
+}
+
+figure:empty {
+  border: 0;
+}
+
+figure {
+  display: inline-block;
+  border: 1px solid #000;
+  border-radius: 5px;
+}
