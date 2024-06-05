@@ -3610,6 +3610,56 @@
 		<ipidsequence class="Incremental" values="EEE0,EEE2,EEE4,EEE6,EEE8,EEEA"></ipidsequence>
 		<tcptssequence class="none returned (unsupported)" values=""></tcptssequence>
 	</host>
+	<host comment="">
+		<status state="up"></status>
+		<address addr="192.168.18.175" vendor="" addrtype="ipv4"></address>
+		<hostnames></hostnames>
+		<ports>
+			<extraports count="995" state="closed"></extraports>
+			<extraports count="996" state="closed"></extraports>
+			<port portid="21" protocol="tcp">
+				<state state="filtered" reason="no-response" reason_ttl="0"></state>
+				<service conf="3" method="table" name="ftp"></service>
+			</port>
+			<port portid="22" protocol="tcp">
+				<state state="filtered" reason="no-response" reason_ttl="0"></state>
+				<service conf="3" method="table" name="ssh"></service>
+			</port>
+			<port portid="23" protocol="tcp">
+				<state state="filtered" reason="no-response" reason_ttl="0"></state>
+				<service conf="3" method="table" name="telnet"></service>
+			</port>
+			<port portid="53" protocol="tcp">
+				<state state="open" reason="syn-ack" reason_ttl="64"></state>
+				<service conf="10" method="probed" name="domain" extrainfo="generic dns response: NOTIMP"></service>
+			</port>
+			<port portid="80" protocol="tcp">
+				<state state="open" reason="syn-ack" reason_ttl="64"></state>
+				<service conf="10" method="probed" name="http"></service>
+			</port>
+			<port portid="135" protocol="tcp">
+				<state state="open" reason="syn-ack" reason_ttl="64"></state>
+				<service conf="10" method="probed" name="msrpc" product="Microsoft Windows RPC"></service>
+			</port>
+			<port portid="139" protocol="tcp">
+				<state state="open" reason="syn-ack" reason_ttl="64"></state>
+				<service conf="10" method="probed" name="netbios-ssn" product="Microsoft Windows netbios-ssn"></service>
+			</port>
+			<port portid="445" protocol="tcp">
+				<state state="open" reason="syn-ack" reason_ttl="64"></state>
+				<service conf="3" method="table" name="microsoft-ds"></service>
+			</port>
+			<port portid="3389" protocol="tcp">
+				<state state="open" reason="syn-ack" reason_ttl="64"></state>
+				<service conf="10" method="probed" name="ms-wbt-server" product="Microsoft Terminal Services"></service>
+			</port>
+		</ports>
+		<uptime seconds="" lastboot=""></uptime>
+		<tcpsequence index="261" difficulty="Good luck!" values="B19243BC,285BF274,6A1425CD,1B9B51F,C308FB06,D33340A1">
+		</tcpsequence>
+		<ipidsequence class="Incremental" values="EEE0,EEE2,EEE4,EEE6,EEE8,EEEA"></ipidsequence>
+		<tcptssequence class="none returned (unsupported)" values=""></tcptssequence>
+	</host>
 	<runstats>
 		<finished time="1708223034" timestr="Sun Feb 18 03:23:54 2024"></finished>
 		<hosts up="6" down="250" total="256"></hosts>

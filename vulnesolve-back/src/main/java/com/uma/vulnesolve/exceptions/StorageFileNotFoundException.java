@@ -1,4 +1,4 @@
-package com.uma.vulnesolve.services;
+package com.uma.vulnesolve.exceptions;
 
 public class StorageFileNotFoundException extends StorageException {
 

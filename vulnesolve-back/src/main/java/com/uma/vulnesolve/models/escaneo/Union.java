@@ -1,4 +1,4 @@
-package com.uma.vulnesolve.models;
+package com.uma.vulnesolve.models.escaneo;
 
 public class Union {
     private int source;

@@ -1,4 +1,4 @@
-package com.uma.vulnesolve.models;
+package com.uma.vulnesolve.models.escaneo;
 
 import java.util.ArrayList;
 import java.util.List;

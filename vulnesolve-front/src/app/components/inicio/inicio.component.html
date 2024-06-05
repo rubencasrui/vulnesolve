@@ -1,35 +1,64 @@
 <h1 class="text-center">Bienvenido a VulneSolve</h1>
 
-<p>
-  ¿Te preocupa la seguridad de tu red?
-  ¡Estás en el lugar correcto! te proporcionamos una herramienta poderosa para identificar las vulnerabilidades en tu red.
-</p>
+<div id="imagen">
+  <p>
+    <img ngSrc="/assets/icon.png" alt="VulneSolve" height="500" width="500" class="img-fluid float-end" priority>
+  </p>
+</div>
 
-<h2>¿Cómo funciona?</h2>
+<div id="texto">
+  <p>
+    ¿Te preocupa la seguridad de tu red?
+    ¡Estás en el lugar correcto! te proporcionamos una herramienta poderosa para identificar las vulnerabilidades en tu red.
+  </p>
 
-<p>
-  Es sencillo.
-  Simplemente carga tu archivo Nmap y deja que nuestra plataforma haga el resto.
-  Analizaremos la topología de tu red,
-  identificaremos los equipos conectados,
-  los puertos abiertos en esos equipos y
-  te proporcionaremos información detallada sobre las vulnerabilidades asociadas con esos puertos.
-</p>
+  <h2>¿Cómo funciona?</h2>
 
-<h2>¿Por qué elegir VulneSolve?</h2>
+  <p>
+    Es sencillo.
+    Simplemente carga tu archivo Nmap y deja que nuestra plataforma haga el resto.
+    Analizaremos la topología de tu red,
+    identificaremos los equipos conectados,
+    los puertos abiertos en esos equipos y
+    te proporcionaremos información detallada sobre las vulnerabilidades asociadas con esos puertos.
+  </p>
 
-<ul>
-  <li>Seguridad en un instante: Con solo unos pocos clics, obtén una visión clara de las vulnerabilidades en tu red.</li>
-  <li>Información detallada: No solo te diremos qué puertos están abiertos, sino también qué vulnerabilidades podrían explotarse a través de esos puertos.</li>
-  <li>Fácil de usar: Nuestra interfaz intuitiva hace que sea simple cargar tu archivo Nmap y obtener resultados rápidos.</li>
-</ul>
+  <h2>¿Por qué elegir VulneSolve?</h2>
 
-<h2>¿Listo para empezar?</h2>
+  <ul>
+    <li>Seguridad en un instante: Con solo unos pocos clics, obtén una visión clara de las vulnerabilidades en tu red.</li>
+    <li>Información detallada: No solo te diremos qué puertos están abiertos, sino también qué vulnerabilidades podrían explotarse a través de esos puertos.</li>
+    <li>Fácil de usar: Nuestra interfaz intuitiva hace que sea simple cargar tu archivo Nmap y obtener resultados rápidos.</li>
+  </ul>
 
-<p>
-  ¡Sube tu archivo Nmap ahora mismo y toma el control de la seguridad de tu red!
-</p>
+  <h2>¿Listo para empezar?</h2>
 
-<div class="text-end">
-  <button type="button" class="btn btn-primary" routerLink="nmap">Cargar tu archivo Nmap</button>
+  <p>
+    ¡Sube tu archivo Nmap ahora mismo y toma el control de la seguridad de tu red!
+  </p>
+
+  <div class="text-center">
+    <button type="button" class="btn btn-primary" routerLink="nmap">Cargar tu archivo Nmap</button>
+  </div>
+
+  <h2>¿En que fuentes nos basamos?</h2>
+
+  <p>
+    En VulneSolve, confiamos en la fuente de vulnerabilidades más reconocida y utilizada a nivel mundial: la National Vulnerability Database (NVD). La NVD proporciona una base de datos completa y actualizada de todas las vulnerabilidades conocidas, asegurando que tu análisis de seguridad se base en la información más precisa y relevante disponible.
+  </p>
+
+  <h2>Estadísticas de Vulnerabilidades Actuales</h2>
+
+  <p>
+    A continuación, te mostramos un resumen visual de las vulnerabilidades existentes en la red según su nivel de severidad. Estos datos te ayudarán a entender mejor los riesgos a los que podrías enfrentarte:
+  </p>
+
+  <div id="graficas">
+
+    <app-estadisticas-v2></app-estadisticas-v2>
+
+    <app-estadisticas-v3></app-estadisticas-v3>
+
+  </div>
+
 </div>

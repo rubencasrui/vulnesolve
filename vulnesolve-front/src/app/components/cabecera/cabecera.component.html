@@ -9,6 +9,21 @@
 
       <a class="nav-link" routerLink="nmap">nmap</a>
 
+      <ng-form #vulnerabilidadesForm="ngForm">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-12">
+              <div class="input-group">
+                <input type="search" name="busqueda" class="form-control" placeholder="Vulnerabilidades" aria-label="Buscar vulnerabilidades" aria-describedby="buscar" [(ngModel)]="busqueda">
+                <button class="btn btn-outline-primary" type="submit" [disabled]="!vulnerabilidadesForm.valid" routerLink="/vulnerabilidades/{{busqueda}}">
+                  <fa-icon [icon]="faSearch" alt="buscar"></fa-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-form>
+
     </div>
   </div>
 </nav>

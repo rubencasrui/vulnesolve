@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-import com.uma.vulnesolve.models.Escaneo;
+import com.uma.vulnesolve.models.escaneo.Escaneo;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 

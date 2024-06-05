@@ -1,38 +1,22 @@
 package com.uma.vulnesolve.controllers;
 
-import com.uma.vulnesolve.models.Escaneo;
+import com.uma.vulnesolve.models.escaneo.Escaneo;
 import com.uma.vulnesolve.services.StorageService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Date;
 
 @RestController
-@RequestMapping("media")
+@RequestMapping("/api/media")
 public class MediaController {
 
     private StorageService storageService;
-    private HttpServletRequest request;
 
-    public MediaController(StorageService storageService, HttpServletRequest request) {
+    public MediaController(StorageService storageService) {
         this.storageService = storageService;
-        this.request = request;
     }
-
-    @GetMapping("hola")
-    public String hola() {
-        return "Hola";
-    }
-
 
     @PostMapping("upload")
     public String handleFileUpload(@RequestParam("file") MultipartFile file) {

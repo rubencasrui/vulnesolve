@@ -1,13 +1,16 @@
-import {Component, ElementRef, HostListener} from '@angular/core';
+import {Component, ElementRef, HostListener, TemplateRef} from '@angular/core';
 import { FormsModule } from "@angular/forms";
 import * as d3 from 'd3';
-import { EscanearService } from "../../services/escanear.service";
-import { NgbToast } from "@ng-bootstrap/ng-bootstrap";
-import {Equipo} from "../../models/equipo";
-import {Union} from "../../models/union";
-import {Escaneo} from "../../models/escaneo";
-import {Puerto} from "../../models/puerto";
-import {SlicePipe} from "@angular/common";
+import { EscanearService } from "../../services/escanear/escanear.service";
+import {NgbModal, NgbPagination, NgbRating, NgbToast} from "@ng-bootstrap/ng-bootstrap";
+import {Equipo} from "../../models/nmap/equipo";
+import {Escaneo} from "../../models/nmap/escaneo";
+import {Puerto} from "../../models/nmap/puerto";
+import {DatePipe, SlicePipe} from "@angular/common";
+import {VulnerabilidadesService} from "../../services/vulnerabilidades/vulnerabilidades.service";
+import {JsonVulneSolve} from "../../models/vulnerabilidades/json-vulne-solve";
+import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
+import {faArrowUpRightFromSquare} from "@fortawesome/free-solid-svg-icons";
 
 @Component({
   selector: 'app-nmap',
@@ -15,7 +18,11 @@ import {SlicePipe} from "@angular/common";
   imports: [
     FormsModule,
     NgbToast,
-    SlicePipe
+    NgbPagination,
+    SlicePipe,
+    NgbRating,
+    FontAwesomeModule,
+    DatePipe
   ],
   templateUrl: './nmap.component.html',
   styleUrl: './nmap.component.css'
@@ -27,33 +34,36 @@ export class NmapComponent {
   titulo : string;
   mensaje : string;
   escaneo : Escaneo;
+  escaneos : string[];
+  vulnerabilidades: JsonVulneSolve;
+  pageSize = 1;
+  page = 1;
+  protected readonly faArrowUpRightFromSquare = faArrowUpRightFromSquare;
 
   constructor(
     private escanearService: EscanearService,
-    public elementRef: ElementRef
+    public elementRef: ElementRef,
+    private vulnerabilidadesService: VulnerabilidadesService,
+    private modalService: NgbModal
   ) {
     this.formData = new FormData();
     this.show = false;
     this.titulo = '';
     this.mensaje = '';
     this.escaneo = new Escaneo([], []);
+    this.escaneos = [];
+    this.vulnerabilidades = new JsonVulneSolve("", 0, "", 0, []);
   }
 
   ngOnInit() {
+    this.buscarEscaneos();
   }
 
-  ejemplo1() {
-    this.escanearService.escaneoEstatico1().subscribe(escaneo => {
-      this.escaneo = escaneo;
-      this.cargarGrafo();
-    })
-  }
-
-  ejemplo2() {
-    this.escanearService.escaneoEstatico2().subscribe(escaneo => {
-      this.escaneo = escaneo;
-      this.cargarGrafo();
-    })
+  buscarEscaneos() : void {
+    this.escanearService.escaneos()
+      .subscribe(escaneos => {
+        this.escaneos = escaneos.trim().split("\n");
+      });
   }
 
   compareEquipos(a : Equipo, b : Equipo) : number {
@@ -88,12 +98,59 @@ export class NmapComponent {
     }
   }
 
-  escanear() {
+  escaneoEstatico(escaneo:string){
+    this.escanearService.escaneo(escaneo)
+      .subscribe(escaneo => {
+        this.escaneo = escaneo;
+        this.cargarGrafo();
+
+        this.cargarVulnerabilidades();
+      });
+  }
+
+  escanearArchivo() {
     this.escanearService.escanear(this.formData)
       .subscribe(escaneo => {
         this.escaneo = escaneo;
-        this.drawNetworkTopology(this.escaneo);
+        this.cargarGrafo();
+
+        this.cargarVulnerabilidades();
       });
+  }
+
+  cargarVulnerabilidades() {
+    let listaPuertos : string[] = [];
+    let setPuertos : Set<string> = new Set<string>();
+    for (let equipo of this.escaneo.equipos) {
+      for (let puerto of equipo.puertos) {
+        console.log(equipo.ip + ' ' + puerto.nombre)
+        if (!listaPuertos.includes(puerto.nombre)) {
+          console.log(' - busco las vulnerabilidades de ' + puerto.nombre);
+          listaPuertos.push(puerto.nombre);
+          this.vulnerabilidadesService.vulnerabilidades(puerto.nombre)
+            .subscribe(vulnerabilidades => {
+              for (let equipo2 of this.escaneo.equipos) {
+                for (let puerto2 of equipo2.puertos) {
+                  if (puerto2.nombre === puerto.nombre) {
+                    puerto2.vulnerabilidades = vulnerabilidades;
+                    console.log(' * Asigno vulnerabilidades a ' + equipo2.ip + ' de ' + puerto2.nombre);
+                  }
+                }
+              }
+            });
+        }
+      }
+    }
+  }
+
+  mostrarModalVulnerabilidades(content: TemplateRef<any>, vulnerabilidades:JsonVulneSolve) : void {
+    this.modalService.open(content, {
+      size: 'lg',
+      scrollable: true,
+      centered: true,
+      backdropClass: 'light-blue'
+    });
+    this.vulnerabilidades = vulnerabilidades;
   }
 
   @HostListener('window:resize', ['$event'])
@@ -129,11 +186,11 @@ export class NmapComponent {
     let carga      =   0;
 
     let gris  = '#BFBFBF';
-    let verde = '#9ED89E';
-    let amarillo = '#EEEE88';
-    let naranja = '#FFB084';
-    let rojo = '#FF3333';
-    let rojo_oscuro = '#8B0000';
+    let verde = '#5fd65f';
+    let amarillo = '#ffdb4d';
+    let naranja = '#ffaa00';
+    let rojo = '#ff5f5f';
+    let purpura = '#b366ff';
 
     d3.select('figure').selectAll('svg').remove();
 
@@ -151,7 +208,7 @@ export class NmapComponent {
       .append('line')
       .attr('stroke', 'blue')
       .attr('stroke-width', 5)
-      .attr('stroke-opacity', 0.50);
+      .attr('stroke-opacity', 0.25);
 
     node = svg
       .append('g')
@@ -179,7 +236,7 @@ export class NmapComponent {
             naranja :
           d.tipo === 3 ?
             rojo :
-            rojo_oscuro
+            purpura
       )
       .call(d3.drag()
         .on('start', (event: any, d: any) => {
@@ -301,5 +358,4 @@ export class NmapComponent {
       d.y = Math.max(0, Math.min(height - alto, d.y));
     }
   }
-
 }

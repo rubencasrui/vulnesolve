@@ -1,10 +1,13 @@
 package com.uma.vulnesolve.services;
 
-import com.uma.vulnesolve.models.Equipo;
-import com.uma.vulnesolve.models.Escaneo;
-import com.uma.vulnesolve.models.Puerto;
-import com.uma.vulnesolve.models.Union;
+import com.uma.vulnesolve.exceptions.StorageException;
+import com.uma.vulnesolve.exceptions.StorageFileNotFoundException;
+import com.uma.vulnesolve.models.escaneo.Equipo;
+import com.uma.vulnesolve.models.escaneo.Escaneo;
+import com.uma.vulnesolve.models.escaneo.Puerto;
+import com.uma.vulnesolve.models.escaneo.Union;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -33,6 +36,9 @@ public class FileSystemStorageService implements StorageService {
     @Value("${media.location}")
     private String mediaLocation;
     private Path rootLocation;
+
+    @Autowired
+    private NveApiService nveApiService;
 
     @Override
     @PostConstruct
@@ -221,6 +227,7 @@ public class FileSystemStorageService implements StorageService {
                             puerto.setEstado(statePort);
                             puerto.setNombre(name);
                             puerto.setDescripcion(product);
+                            puerto.setVulnerabilidades(null);
                         }
                     }
 
@@ -325,7 +332,7 @@ public class FileSystemStorageService implements StorageService {
         escaneo.setEquipos(new ArrayList<>(dicEquipos.values()));
 
         // Mostrar escaneo
-        System.out.println(escaneo);
+        // System.out.println(escaneo);
 
         return escaneo;
     }

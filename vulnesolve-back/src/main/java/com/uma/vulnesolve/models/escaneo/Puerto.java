@@ -1,4 +1,7 @@
-package com.uma.vulnesolve.models;
+package com.uma.vulnesolve.models.escaneo;
+
+import com.uma.vulnesolve.models.vulnerabilidades.estadistica.TotalResults;
+import com.uma.vulnesolve.models.vulnerabilidades.vulnesolve.JsonVulneSolve;
 
 public class Puerto {
 
@@ -6,19 +9,22 @@ public class Puerto {
     private String estado;
     private String nombre;
     private String descripcion;
+    private JsonVulneSolve vulnerabilidades;
 
     public Puerto() {
         this.numero = 0;
         this.estado = "";
         this.nombre = "";
         this.descripcion = "";
+        this.vulnerabilidades = null;
     }
 
-    public Puerto(int numero, String estado, String nombre, String descripcion) {
+    public Puerto(int numero, String estado, String nombre, String descripcion, JsonVulneSolve vulnerabilidades) {
         this.numero = numero;
         this.estado = estado;
         this.nombre = nombre;
         this.descripcion = descripcion;
+        this.vulnerabilidades = vulnerabilidades;
     }
 
     public int getNumero() {
@@ -53,14 +59,12 @@ public class Puerto {
         this.descripcion = descripcion;
     }
 
-    @Override
-    public String toString() {
-        return
-        "Puerto: {" +
-            "numero: '" + numero + "', "+
-            "estado: '" + estado + "', "+
-            "nombre: '" + nombre + "'," +
-            "descripcion: '" + descripcion + "'"+
-        '}';
+    public JsonVulneSolve getVulnerabilidades() {
+        return vulnerabilidades;
     }
+
+    public void setVulnerabilidades(JsonVulneSolve vulnerabilidades) {
+        this.vulnerabilidades = vulnerabilidades;
+    }
+
 }
