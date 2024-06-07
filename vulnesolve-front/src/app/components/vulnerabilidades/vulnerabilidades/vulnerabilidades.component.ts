@@ -57,10 +57,14 @@ export class VulnerabilidadesComponent {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.buscarVulnerabilidades();
+    console.log(changes)
+    this.buscarVulnerabilidades(5);
   }
 
-  buscarVulnerabilidades(): void {
+  buscarVulnerabilidades(intentos : number): void {
+    let llamo: number = Date.now();
+    let recivo : number = 0;
+
     console.log("cargando vulnerabilidades " + this.servicio);
     this.cargando = true;
     this.vulnerabilidadesService.vulnerabilidades(this.servicio)
@@ -71,8 +75,18 @@ export class VulnerabilidadesComponent {
       })
       .add(() => {
         if (this.cargando){
-          console.log("Volviendo a cargar vulnerabilidades");
-          this.buscarVulnerabilidades();
+          if (intentos > 0){
+            console.log("Volviendo a cargar vulnerabilidades, quedan " + (intentos-1) + " intentos.");
+            this.buscarVulnerabilidades(intentos-1);
+          }
+          else{
+            this.vulnerabilidades = new JsonVulneSolve(this.servicio, 0, "", -1, []);
+            this.cargando = false;
+          }
+        }
+        else {
+          recivo = Date.now();
+          console.log(this.servicio+": "+(recivo-llamo)/1000+" segundos");
         }
       });
   }

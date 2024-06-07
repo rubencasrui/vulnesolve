@@ -120,27 +120,58 @@ export class NmapComponent {
 
   cargarVulnerabilidades() {
     let listaPuertos : string[] = [];
-    let setPuertos : Set<string> = new Set<string>();
     for (let equipo of this.escaneo.equipos) {
       for (let puerto of equipo.puertos) {
-        console.log(equipo.ip + ' ' + puerto.nombre)
         if (!listaPuertos.includes(puerto.nombre)) {
           console.log(' - busco las vulnerabilidades de ' + puerto.nombre);
           listaPuertos.push(puerto.nombre);
-          this.vulnerabilidadesService.vulnerabilidades(puerto.nombre)
-            .subscribe(vulnerabilidades => {
-              for (let equipo2 of this.escaneo.equipos) {
-                for (let puerto2 of equipo2.puertos) {
-                  if (puerto2.nombre === puerto.nombre) {
-                    puerto2.vulnerabilidades = vulnerabilidades;
-                    console.log(' * Asigno vulnerabilidades a ' + equipo2.ip + ' de ' + puerto2.nombre);
-                  }
-                }
-              }
-            });
+
+          this.buscarVulnerabilidades(puerto.nombre, 5);
         }
       }
     }
+  }
+
+  buscarVulnerabilidades(servicio : string, intentos : number) : void {
+    let encontrado : boolean = false;
+    let llamo: number = Date.now();
+    let recivo : number = 0;
+    this.vulnerabilidadesService.vulnerabilidades(servicio)
+      .subscribe(vulnerabilidades => {
+        encontrado = true;
+        for (let equipo of this.escaneo.equipos) {
+          for (let puerto of equipo.puertos) {
+            if (puerto.nombre === servicio) {
+              puerto.vulnerabilidades = vulnerabilidades;
+              console.log(' * Asigno vulnerabilidades a ' + equipo.ip + ' de ' + puerto.nombre);
+            }
+          }
+        }
+      })
+      .add(() => {
+        if (encontrado){
+          console.log(' * Vulnerabilidades asignadas a ' + servicio);
+        }
+        else{
+          if (intentos > 0){
+            console.log("Volver a intentar buscar el servicio " + servicio + ", quedan " + (intentos-1) + " intentos");
+            this.buscarVulnerabilidades(servicio, intentos - 1);
+          }
+          else {
+            for (let equipo of this.escaneo.equipos) {
+              for (let puerto of equipo.puertos) {
+                if (puerto.nombre === servicio) {
+                  console.log(' * No se encontraron vulnerabilidades para ' + equipo.ip + ' de ' + puerto.nombre);
+                  puerto.vulnerabilidades = new JsonVulneSolve("", 0, "", -1, [])
+                }
+              }
+            }
+          }
+        }
+
+        recivo = Date.now();
+        console.log(servicio+": "+(recivo-llamo)/1000+" segundos");
+      });
   }
 
   mostrarModalVulnerabilidades(content: TemplateRef<any>, vulnerabilidades:JsonVulneSolve) : void {

@@ -1,5 +1,6 @@
 package com.uma.vulnesolve.models.vulnerabilidades.nve;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JsonNve {
@@ -8,6 +9,8 @@ public class JsonNve {
     private List<Vulnerabilities> vulnerabilities;
 
     public JsonNve() {
+        totalResults = 0;
+        vulnerabilities = new ArrayList<>();
     }
 
     public JsonNve(int totalResults, List<Vulnerabilities> vulnerabilities) {

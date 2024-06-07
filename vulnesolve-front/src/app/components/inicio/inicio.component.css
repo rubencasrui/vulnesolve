@@ -1,0 +1,7 @@
+#graficas {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}

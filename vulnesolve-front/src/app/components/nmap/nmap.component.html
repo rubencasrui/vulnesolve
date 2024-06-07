@@ -56,9 +56,15 @@
                             @if (puerto.descripcion.length > 0){<p class="card-text">Descripción: {{puerto.descripcion}}</p>}
                             <p class="card-text">Estado: {{puerto.estado}}</p>
                             @if (puerto.vulnerabilidades != null){
-                              <p class="card-text">Vulnerabilidades: {{puerto.vulnerabilidades.resultados}}</p>
-                              @if (puerto.vulnerabilidades.resultados > 0){
-                                <button class="btn btn-primary" (click)="mostrarModalVulnerabilidades(content, puerto.vulnerabilidades)">Mostrar vulnerabilidades</button>
+                              @if (puerto.vulnerabilidades.resultados == -1){
+                                <p class="card-text">Error al buscar las vulnerabilidades</p>
+                                <p class="card-text">Inténtalo más tarde.</p>
+                              }
+                              @else{
+                                <p class="card-text">Vulnerabilidades: {{puerto.vulnerabilidades.resultados}}</p>
+                                @if (puerto.vulnerabilidades.resultados > 0){
+                                  <button class="btn btn-primary" (click)="mostrarModalVulnerabilidades(content, puerto.vulnerabilidades)">Mostrar vulnerabilidades</button>
+                                }
                               }
                             }
                             @else {
@@ -128,7 +134,7 @@
 
     @if (vulnerabilidades.vulnerabilidades.length > 0){
       <p>{{vulnerabilidades.vulnerabilidades.length}} ultimas vulnerabilidades:</p>
-      @for (vulnerabilidad of vulnerabilidades.vulnerabilidades.reverse() | slice: (page - 1) * pageSize : page * pageSize; track $index){
+      @for (vulnerabilidad of vulnerabilidades.vulnerabilidades | slice: (page - 1) * pageSize : page * pageSize; track $index){
         <div class="card text-center mb-2">
           <div class="card-body">
             <h5 class="card-title">{{vulnerabilidad.id}} <a href="https://nvd.nist.gov/vuln/detail/{{vulnerabilidad.id}}" target="_blank"><fa-icon [icon]="faArrowUpRightFromSquare" alt="ver mas"></fa-icon></a></h5>
@@ -208,7 +214,7 @@
         [collectionSize]="vulnerabilidades.vulnerabilidades.length"
         [pageSize]="pageSize"
         [(page)]="page"
-        [maxSize]="3"
+        [maxSize]="5"
         [rotate]="true"
         [ellipses]="false"
         [boundaryLinks]="true"

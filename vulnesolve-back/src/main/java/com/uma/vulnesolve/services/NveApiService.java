@@ -8,6 +8,7 @@ import com.uma.vulnesolve.models.vulnerabilidades.vulnesolve.Vulnerabilidad;
 import com.uma.vulnesolve.repositories.NveApiRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,13 +25,54 @@ public class NveApiService {
         return nveApiRepository.getVulnerabilidades(keywordSearch).block();
     }
 
-    public JsonVulneSolve getVulnerabilidades(String keywordSearch) {
+    public JsonVulneSolve getVulnerabilidadesOld(String keywordSearch) {
         JsonNve peticion = nveApiRepository.getVulnerabilidades(keywordSearch).block();
 
         JsonVulneSolve respuesta = new JsonVulneSolve();
 
         respuesta = transformar(peticion, respuesta);
         respuesta.setNombre(keywordSearch);
+
+        return respuesta;
+    }
+
+    public JsonVulneSolve getVulnerabilidades(String keywordSearch) {
+        long inicio = 0;
+        long fin = 0;
+        double tiempoTotalResults = 0;
+        double tiempoPeticion = 0;
+        double tiempoTransformar = 0;
+
+        inicio = (new Date()).getTime();
+        int totalResultados = nveApiRepository.getEstadisticaVulnerabilidad(keywordSearch).block().getTotalResults();
+        fin = (new Date()).getTime();
+        tiempoTotalResults = (double) (fin - inicio) /1000;
+
+        JsonNve peticion = new JsonNve();
+        JsonVulneSolve respuesta = new JsonVulneSolve();
+        int resultPerPage = 2000;
+
+
+        inicio = (new Date()).getTime();
+        if (totalResultados > 0){
+            if (totalResultados > resultPerPage) {
+                peticion = nveApiRepository.getVulnerabilidadesParam(keywordSearch, resultPerPage+"", (totalResultados-resultPerPage)+"").block();
+            }
+            else {
+                peticion = nveApiRepository.getVulnerabilidades(keywordSearch).block();
+            }
+        }
+        fin = (new Date()).getTime();
+        tiempoPeticion = (double) (fin - inicio) /1000;
+
+        respuesta.setNombre(keywordSearch);
+
+        inicio = (new Date()).getTime();
+        respuesta = transformar(peticion, respuesta);
+        fin = (new Date()).getTime();
+        tiempoTransformar = (double) (fin - inicio) /1000;
+
+        System.out.println(keywordSearch + ": " + "tiempoTotalResults: " + tiempoTotalResults + ", tiempoPeticion: " + tiempoPeticion + ", tiempoTransformar: " + tiempoTransformar + ", tiempoTotal: " + (tiempoTotalResults + tiempoPeticion + tiempoTransformar));
 
         return respuesta;
     }
@@ -48,6 +90,7 @@ public class NveApiService {
     }
 
     private JsonVulneSolve transformar(JsonNve peticion, JsonVulneSolve respuesta) {
+
         respuesta.setResultados(peticion.getTotalResults());
 
         double puntuacion20 = 0;
@@ -62,7 +105,7 @@ public class NveApiService {
             Vulnerabilities vulne = peticion.getVulnerabilities().get(i);
             Vulnerabilidad vulnerabilidad = new Vulnerabilidad();
 
-            if (cantidadVulnerabilidades - i <= 100){
+            if (cantidadVulnerabilidades - i <= 2000){
                 respuesta.getVulnerabilidades().add(vulnerabilidad);
             }
 
@@ -155,7 +198,6 @@ public class NveApiService {
         else {
             respuesta.setSeveridadVulneSolve("CRITICO");
         }
-
         return respuesta;
     }
 }

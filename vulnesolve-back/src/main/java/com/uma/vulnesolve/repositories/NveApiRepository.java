@@ -21,7 +21,7 @@ public class NveApiRepository {
     public NveApiRepository() {
         this.urlBase = "https://services.nvd.nist.gov/rest/json/cves/2.0";
         this.apiKey = "843a5258-e1ff-4526-990b-35e11e6d1f70";
-        this.segundos = 30;
+        this.segundos = 60;
         this.bytes = 64 * 1024 * 1024; // 64 MB
 
         HttpClient httpClient = HttpClient.create().responseTimeout(java.time.Duration.ofSeconds(segundos));
@@ -55,23 +55,49 @@ public class NveApiRepository {
         return respuesta;
     }
 
+    public Mono<JsonNve> getVulnerabilidadesParam(String keywordSearch, String resultsPerPage, String startIndex) {
+        Mono<JsonNve> respuesta = null;
+
+        respuesta = this.webClient
+            .get()
+            .uri(uriBuilder -> uriBuilder
+                .queryParam("keywordSearch",keywordSearch)
+                .queryParam("resultsPerPage", resultsPerPage)
+                .queryParam("startIndex", startIndex)
+                .build()
+            )
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .onStatus(
+                httpStatus -> httpStatus.is4xxClientError() || httpStatus.is5xxServerError(),
+                clientResponse -> Mono.error(new RuntimeException("Error en la petición"))
+            )
+            .bodyToMono(JsonNve.class);
+
+
+        return respuesta;
+    }
+
     public Mono<TotalResults> getEstadisticaVulnerabilidad(String keywordSearch) {
         Mono<TotalResults> respuesta = null;
 
         respuesta = this.webClient
-                .get()
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("keywordSearch",keywordSearch)
-                        .queryParam("resultsPerPage", "1")
-                        .build()
-                )
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .onStatus(
-                        httpStatus -> httpStatus.is4xxClientError() || httpStatus.is5xxServerError(),
-                        clientResponse -> Mono.error(new RuntimeException("Error en la petición"))
-                )
-                .bodyToMono(TotalResults.class);
+            .get()
+            .uri(uriBuilder -> uriBuilder
+                .queryParam("keywordSearch",keywordSearch)
+                .queryParam("resultsPerPage", "1")
+                .queryParam("startIndex", "0")
+                .build()
+            )
+            .accept(MediaType.APPLICATION_JSON)
+            .retrieve()
+            .onStatus(
+                httpStatus ->
+                    httpStatus.is4xxClientError() || httpStatus.is5xxServerError(),
+                clientResponse ->
+                    Mono.error(new RuntimeException("Error en la petición"))
+            )
+            .bodyToMono(TotalResults.class);
 
         return respuesta;
     }

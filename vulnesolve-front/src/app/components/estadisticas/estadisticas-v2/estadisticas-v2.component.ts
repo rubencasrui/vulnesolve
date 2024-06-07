@@ -34,10 +34,17 @@ export class EstadisticasV2Component {
 
   ngOnInit() {
     this.cargarEstadisticasV2();
+
+    let llamo: number = Date.now();
+    let recivo : number = 0;
     this.vulnerabilidadesService.vulnerabilidadesVersion2()
       .subscribe(res => {
         this.severidadesV2 = res;
         this.cargarEstadisticasV2();
+      })
+      .add(() => {
+        recivo = Date.now();
+        console.log("V2: "+(recivo-llamo)/1000+" segundos");
       });
   }
 

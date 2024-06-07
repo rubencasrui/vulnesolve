@@ -33,16 +33,23 @@ export class EstadisticasV3Component {
   }
 
   ngOnInit() {
-    this.cargarEstadisticasV2();
+    this.cargarEstadisticasV3();
+
+    let llamo: number = Date.now();
+    let recivo : number = 0;
     this.vulnerabilidadesService.vulnerabilidadesVersion3()
       .subscribe(res => {
           this.severidadesV3 = res;
-          this.cargarEstadisticasV2();
+          this.cargarEstadisticasV3();
         }
-      );
+      )
+      .add(() => {
+        recivo = Date.now();
+        console.log("V3: "+(recivo-llamo)/1000+" segundos");
+      });
   }
 
-  private cargarEstadisticasV2() {
+  private cargarEstadisticasV3() {
       this.createSvg();
       this.createColors();
       this.drawChart();
