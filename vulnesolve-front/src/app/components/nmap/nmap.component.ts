@@ -3,9 +3,9 @@ import { FormsModule } from "@angular/forms";
 import * as d3 from 'd3';
 import { EscanearService } from "../../services/escanear/escanear.service";
 import {NgbModal, NgbPagination, NgbRating, NgbToast} from "@ng-bootstrap/ng-bootstrap";
-import {Equipo} from "../../models/nmap/equipo";
-import {Escaneo} from "../../models/nmap/escaneo";
-import {Puerto} from "../../models/nmap/puerto";
+import {EquipoNmap} from "../../models/nmap/equipoNmap";
+import {EscaneoNmap} from "../../models/nmap/escaneoNmap";
+import {PuertoNmap} from "../../models/nmap/puertoNmap";
 import {DatePipe, SlicePipe} from "@angular/common";
 import {VulnerabilidadesService} from "../../services/vulnerabilidades/vulnerabilidades.service";
 import {JsonVulneSolve} from "../../models/vulnerabilidades/json-vulne-solve";
@@ -33,7 +33,7 @@ export class NmapComponent {
   show : boolean;
   titulo : string;
   mensaje : string;
-  escaneo : Escaneo;
+  escaneo : EscaneoNmap;
   escaneos : string[];
   vulnerabilidades: JsonVulneSolve;
   pageSize = 1;
@@ -50,7 +50,7 @@ export class NmapComponent {
     this.show = false;
     this.titulo = '';
     this.mensaje = '';
-    this.escaneo = new Escaneo([], []);
+    this.escaneo = new EscaneoNmap([], []);
     this.escaneos = [];
     this.vulnerabilidades = new JsonVulneSolve("", 0, "", 0, []);
   }
@@ -66,14 +66,14 @@ export class NmapComponent {
       });
   }
 
-  compareEquipos(a : Equipo, b : Equipo) : number {
+  compareEquipos(a : EquipoNmap, b : EquipoNmap) : number {
     var x = parseInt(a.id);
     var y = parseInt(b.id);
 
     return x - y;
   }
 
-  comparePuertos(a : Puerto, b : Puerto) : number {
+  comparePuertos(a : PuertoNmap, b : PuertoNmap) : number {
     return a.numero - b.numero;
   }
 
@@ -191,7 +191,7 @@ export class NmapComponent {
     }
   }
 
-  drawNetworkTopology(escaneo : Escaneo): void {
+  drawNetworkTopology(escaneo : EscaneoNmap): void {
 
     var nodes = escaneo.equipos;
     var links = escaneo.uniones;

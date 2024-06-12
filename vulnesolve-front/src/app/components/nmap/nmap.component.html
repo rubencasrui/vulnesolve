@@ -41,7 +41,7 @@
           @for (equipo of escaneo.equipos.sort(compareEquipos) | slice: 1 : escaneo.equipos.length; track $index){
             <div class="card text-center mb-2">
               <div class="card-body">
-                <h5 class="card-title">Equipo {{equipo.id}}</h5>
+                <h5 class="card-title">EquipoNmap {{equipo.id}}</h5>
                 <p class="card-text">Dirección IP: {{equipo.ip}}</p>
                 @if (equipo.mac.length > 0){<p class="card-text">Dirección MAC: {{equipo.mac}}</p>}
                 <p class="card-text">Puertos abiertos: {{equipo.puertos.length}}</p>
@@ -134,6 +134,16 @@
 
     @if (vulnerabilidades.vulnerabilidades.length > 0){
       <p>{{vulnerabilidades.vulnerabilidades.length}} ultimas vulnerabilidades:</p>
+      <ngb-pagination
+        class="d-flex justify-content-center mt-2"
+        [collectionSize]="vulnerabilidades.vulnerabilidades.length"
+        [pageSize]="pageSize"
+        [(page)]="page"
+        [maxSize]="5"
+        [rotate]="true"
+        [ellipses]="false"
+        [boundaryLinks]="true"
+      />
       @for (vulnerabilidad of vulnerabilidades.vulnerabilidades | slice: (page - 1) * pageSize : page * pageSize; track $index){
         <div class="card text-center mb-2">
           <div class="card-body">

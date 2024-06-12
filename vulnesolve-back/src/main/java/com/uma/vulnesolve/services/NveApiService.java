@@ -15,6 +15,7 @@ import java.util.List;
 @Service
 public class NveApiService {
 
+    public static final double INCREMENTO_POR_ACTUALIDAD = 0.2;
     private NveApiRepository nveApiRepository;
 
     public NveApiService(NveApiRepository nveApiRepository) {
@@ -56,7 +57,20 @@ public class NveApiService {
         inicio = (new Date()).getTime();
         if (totalResultados > 0){
             if (totalResultados > resultPerPage) {
-                peticion = nveApiRepository.getVulnerabilidadesParam(keywordSearch, resultPerPage+"", (totalResultados-resultPerPage)+"").block();
+                int opcion = 1;
+                if (opcion == 1){
+                    peticion = nveApiRepository.getVulnerabilidadesParam(keywordSearch, resultPerPage+"", (totalResultados-resultPerPage)+"").block();
+                }
+                else if(opcion == 2){
+                    peticion = nveApiRepository.getVulnerabilidadesParam(keywordSearch, resultPerPage+"", 0+"").block();
+                    System.out.println("Cantidad de vulnerabilidades: " + peticion.getVulnerabilities().size());
+                    while(peticion.getVulnerabilities().size()<totalResultados){
+                        peticion.getVulnerabilities().addAll(
+                                nveApiRepository.getVulnerabilidadesParam(keywordSearch, resultPerPage+"", peticion.getVulnerabilities().size()+"").block().getVulnerabilities()
+                        );
+                        System.out.println("Cantidad de vulnerabilidades: " + peticion.getVulnerabilities().size());
+                    }
+                }
             }
             else {
                 peticion = nveApiRepository.getVulnerabilidades(keywordSearch).block();
@@ -99,6 +113,7 @@ public class NveApiService {
         int cantidad20 = 0;
         int cantidad30 = 0;
         int cantidad31 = 0;
+        int cantidadActuales = 0;
 
         int cantidadVulnerabilidades = peticion.getVulnerabilities().size();
         for(int i = 0; i < cantidadVulnerabilidades; i++){
@@ -106,30 +121,34 @@ public class NveApiService {
             Vulnerabilidad vulnerabilidad = new Vulnerabilidad();
 
             if (cantidadVulnerabilidades - i <= 2000){
-                respuesta.getVulnerabilidades().add(vulnerabilidad);
             }
+            respuesta.getVulnerabilidades().add(vulnerabilidad);
 
             Cve cve = vulne.getCve();
             vulnerabilidad.setId(vulne.getCve().getId());
 
-            int encontrado = 1;
+            int prioridadEncontrado = 1;
             List<Description> descripcions = vulne.getCve().getDescriptions();
-            for (int j = 0; j<descripcions.size() && encontrado != 3; j++) {
+            for (int j = 0; j<descripcions.size() && prioridadEncontrado != 3; j++) {
                 if (descripcions.get(j).getLang().equals("es")) {
                     vulnerabilidad.setDescripcion(descripcions.get(j).getValue());
-                    encontrado = 3;
+                    prioridadEncontrado = 3;
                 }
                 else if (descripcions.get(j).getLang().equals("en")) {
                     vulnerabilidad.setDescripcion(descripcions.get(j).getValue());
-                    encontrado = 2;
+                    prioridadEncontrado = 2;
                 }
-                else if (encontrado != 2){
+                else if (prioridadEncontrado != 2){
                     vulnerabilidad.setDescripcion(descripcions.get(j).getValue());
                 }
             }
 
             int anyos =  (new Date()).getYear() - cve.getPublished().getYear();
             int ponderacion = (anyos > 5) ? 1 : (anyos > 3) ? 2 : 5;
+
+            if (ponderacion>1){
+                cantidadActuales++;
+            }
 
             Metrics metrics = vulne.getCve().getMetrics();
             List<CvssMetricV20> cvssMetricV2 = metrics.getCvssMetricV2();
@@ -183,6 +202,13 @@ public class NveApiService {
         double puntuacion = 0;
         if (cantidad20 + cantidad30 + cantidad31 > 0) {
             puntuacion += (puntuacion20 + puntuacion30 + puntuacion31 ) / (cantidad20 + cantidad30 + cantidad31);
+        }
+
+
+        if (respuesta.getVulnerabilidades().size()>0) {
+            puntuacion = puntuacion * (1 + ((double) cantidadActuales / respuesta.getVulnerabilidades().size()) * INCREMENTO_POR_ACTUALIDAD);
+            if (puntuacion > 10)
+                puntuacion = 10;
         }
 
         respuesta.setIndiceVulneSolve(puntuacion);

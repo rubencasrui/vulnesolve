@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-import com.uma.vulnesolve.models.escaneo.Escaneo;
+import com.uma.vulnesolve.models.nmap.EscaneoNmap;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +21,7 @@ public interface StorageService {
 
     Resource cargarComoRecurso(String filename);
 
-    Escaneo leerEscaneo(String filename);
+    EscaneoNmap leerEscaneo(String filename);
 
     void borrar(String filename);
 

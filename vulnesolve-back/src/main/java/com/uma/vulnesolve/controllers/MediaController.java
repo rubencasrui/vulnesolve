@@ -1,6 +1,6 @@
 package com.uma.vulnesolve.controllers;
 
-import com.uma.vulnesolve.models.escaneo.Escaneo;
+import com.uma.vulnesolve.models.nmap.EscaneoNmap;
 import com.uma.vulnesolve.services.StorageService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -84,24 +84,24 @@ public class MediaController {
     }
 
     @GetMapping("/escaneo/{filename}")
-    public ResponseEntity<Escaneo> escaneo(@PathVariable String filename) {
-        Escaneo escaneo = storageService.leerEscaneo(filename);
+    public ResponseEntity<EscaneoNmap> escaneo(@PathVariable String filename) {
+        EscaneoNmap escaneoNmap = storageService.leerEscaneo(filename);
 
-        return ResponseEntity.ok(escaneo);
+        return ResponseEntity.ok(escaneoNmap);
     }
 
     @PostMapping("escanear")
-    public ResponseEntity<Escaneo> updatedFile(@RequestParam("file") MultipartFile file) {
-        ResponseEntity<Escaneo> responseEntity = null;
+    public ResponseEntity<EscaneoNmap> updatedFile(@RequestParam("file") MultipartFile file) {
+        ResponseEntity<EscaneoNmap> responseEntity = null;
 
         String nombre = null;
 
         try {
             nombre = storageService.guardar(file);
 
-            Escaneo escaneo = storageService.leerEscaneo(nombre);
+            EscaneoNmap escaneoNmap = storageService.leerEscaneo(nombre);
 
-            responseEntity = ResponseEntity.ok(escaneo);
+            responseEntity = ResponseEntity.ok(escaneoNmap);
         }
         catch (Exception e) {
             responseEntity = ResponseEntity.badRequest().build();

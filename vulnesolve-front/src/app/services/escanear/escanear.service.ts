@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import {Escaneo} from "../../models/nmap/escaneo";
+import {EscaneoNmap} from "../../models/nmap/escaneoNmap";
 import {Observable} from "rxjs";
 import {environment} from "../../../environments/environment";
 
@@ -15,10 +15,10 @@ export class EscanearService {
     private http: HttpClient
   ) { }
 
-  escanear(formData : FormData) : Observable<Escaneo> {
+  escanear(formData : FormData) : Observable<EscaneoNmap> {
     var escaneo;
 
-    escaneo = this.http.post<Escaneo>(this.api+'/media/escanear', formData);
+    escaneo = this.http.post<EscaneoNmap>(this.api+'/media/escanear', formData);
 
     return escaneo;
   }
@@ -33,10 +33,10 @@ export class EscanearService {
     return escaneos;
   }
 
-  escaneo(id : string) : Observable<Escaneo> {
+  escaneo(id : string) : Observable<EscaneoNmap> {
     var escaneo;
 
-    escaneo = this.http.get<Escaneo>(this.api+'/media/escaneo/'+id);
+    escaneo = this.http.get<EscaneoNmap>(this.api+'/media/escaneo/'+id);
 
     return escaneo;
   }

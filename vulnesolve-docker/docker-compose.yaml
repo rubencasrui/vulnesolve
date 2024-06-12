@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+
+  mysql:
+    build: ./mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - vulnesolve_network
+
+  spring-boot:
+    build: ./spring-boot
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - vulnesolve_network
+
+networks:
+  vulnesolve_network:
+
+volumes:
+  mysql_data:

@@ -47,7 +47,7 @@ export class VulnerabilidadesComponent {
     this.vulnerabilidades = new JsonVulneSolve("", 0, "", 0, []);
     this.cargando = true;
     this.page = 1;
-    this.pageSize = 1;
+    this.pageSize = 10;
 
     this.faSearch = faSearch;
     this.faArrowUpRightFromSquare = faArrowUpRightFromSquare;

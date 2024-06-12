@@ -2,10 +2,10 @@ package com.uma.vulnesolve.services;
 
 import com.uma.vulnesolve.exceptions.StorageException;
 import com.uma.vulnesolve.exceptions.StorageFileNotFoundException;
-import com.uma.vulnesolve.models.escaneo.Equipo;
-import com.uma.vulnesolve.models.escaneo.Escaneo;
-import com.uma.vulnesolve.models.escaneo.Puerto;
-import com.uma.vulnesolve.models.escaneo.Union;
+import com.uma.vulnesolve.models.nmap.EquipoNmap;
+import com.uma.vulnesolve.models.nmap.EscaneoNmap;
+import com.uma.vulnesolve.models.nmap.PuertoNmap;
+import com.uma.vulnesolve.models.nmap.UnionNmap;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -125,16 +125,16 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public Escaneo leerEscaneo(String filename) {
+    public EscaneoNmap leerEscaneo(String filename) {
         // Crear el escaneo
-        Escaneo escaneo = new Escaneo();
+        EscaneoNmap escaneoNmap = new EscaneoNmap();
         int idEquipos = -1;
 
         // Crear un diccionario de equipos
-        Map<String, Equipo> dicEquipos = new HashMap<>();
+        Map<String, EquipoNmap> dicEquipos = new HashMap<>();
 
         // Añado el primero localhost
-        Equipo localhost = new Equipo(++idEquipos, "localhost", "", 0, 0, 0, new ArrayList<>());
+        EquipoNmap localhost = new EquipoNmap(++idEquipos, "localhost", "", 0, 0, 0, new ArrayList<>());
         dicEquipos.put(localhost.getIp(), localhost);
 
         try {
@@ -166,10 +166,10 @@ public class FileSystemStorageService implements StorageService {
                 String state = statusElement.getAttribute("state");
                 if (state.equals("up")) {
                     // Crear el equipo
-                    Equipo equipo = new Equipo();
-                    equipo.setId(++idEquipos);
-                    equipo.setX(idEquipos*10);
-                    equipo.setY(idEquipos*10);
+                    EquipoNmap equipoNmap = new EquipoNmap();
+                    equipoNmap.setId(++idEquipos);
+                    equipoNmap.setX(idEquipos*10);
+                    equipoNmap.setY(idEquipos*10);
 
                     // Obtener la lista de nodos 'address' dentro de 'host'
                     NodeList addressList = hostElement.getElementsByTagName("address");
@@ -181,19 +181,19 @@ public class FileSystemStorageService implements StorageService {
                         String vendor = addressElement.getAttribute("vendor");
 
                         if (type.equals("ipv4")) {
-                            equipo.setIp(addr);
+                            equipoNmap.setIp(addr);
                         }
                         else if (type.equals("mac")) {
-                            equipo.setMac(addr);
+                            equipoNmap.setMac(addr);
                         }
                     }
 
                     // Una vez tiene la ip lo añado al diccionario
-                    dicEquipos.put(equipo.getIp(), equipo);
+                    dicEquipos.put(equipoNmap.getIp(), equipoNmap);
 
                     // Crear lista de puertos del equipo
-                    List<Puerto> puertos = new ArrayList<>();
-                    equipo.setPuertos(puertos);
+                    List<PuertoNmap> puertoNmaps = new ArrayList<>();
+                    equipoNmap.setPuertos(puertoNmaps);
 
                     // Obtener la lista de nodos 'ports' dentro de 'host'
                     NodeList portsList = hostElement.getElementsByTagName("ports");
@@ -203,9 +203,9 @@ public class FileSystemStorageService implements StorageService {
                         NodeList portList = portsElement.getElementsByTagName("port");
                         for (int k = 0; k < portList.getLength(); k++) {
                             // Creo este puerto
-                            Puerto puerto = new Puerto();
+                            PuertoNmap puertoNmap = new PuertoNmap();
                             // Lo añado a la lista de puertos del equipo
-                            puertos.add(puerto);
+                            puertoNmaps.add(puertoNmap);
 
                             Element portElement = (Element) portList.item(k);
 
@@ -223,29 +223,29 @@ public class FileSystemStorageService implements StorageService {
                             String product = serviceElement.getAttribute("product");
 
                             // Añadir el numero de puerto y nombre del servicio
-                            puerto.setNumero(Integer.parseInt(portId));
-                            puerto.setEstado(statePort);
-                            puerto.setNombre(name);
-                            puerto.setDescripcion(product);
-                            puerto.setVulnerabilidades(null);
+                            puertoNmap.setNumero(Integer.parseInt(portId));
+                            puertoNmap.setEstado(statePort);
+                            puertoNmap.setNombre(name);
+                            puertoNmap.setDescripcion(product);
+                            puertoNmap.setVulnerabilidades(null);
                         }
                     }
 
                     // Asignar tipo segun la cantidad de puertos abiertos
-                    if(puertos.size() == 0) {
-                        equipo.setTipo(0);
+                    if(puertoNmaps.size() == 0) {
+                        equipoNmap.setTipo(0);
                     }
-                    else if(1 <= puertos.size() && puertos.size() <= 2){
-                        equipo.setTipo(1);
+                    else if(1 <= puertoNmaps.size() && puertoNmaps.size() <= 2){
+                        equipoNmap.setTipo(1);
                     }
-                    else if(3 <= puertos.size() && puertos.size() <= 4){
-                        equipo.setTipo(2);
+                    else if(3 <= puertoNmaps.size() && puertoNmaps.size() <= 4){
+                        equipoNmap.setTipo(2);
                     }
-                    else if(4 <= puertos.size() && puertos.size() <= 8){
-                        equipo.setTipo(3);
+                    else if(4 <= puertoNmaps.size() && puertoNmaps.size() <= 8){
+                        equipoNmap.setTipo(3);
                     }
                     else {
-                        equipo.setTipo(4);
+                        equipoNmap.setTipo(4);
                     }
 
                     // Obtener la lista de nodos 'trace' dentro de 'host'
@@ -253,15 +253,15 @@ public class FileSystemStorageService implements StorageService {
                     if(traceList.getLength() == 0) {
                         Element addressElement = (Element) addressList.item(0);
 
-                        Union union = new Union();
+                        UnionNmap unionNmap = new UnionNmap();
 
-                        Equipo origen = dicEquipos.get("localhost");
-                        Equipo destino = dicEquipos.get(addressElement.getAttribute("addr"));
+                        EquipoNmap origen = dicEquipos.get("localhost");
+                        EquipoNmap destino = dicEquipos.get(addressElement.getAttribute("addr"));
 
-                        union.setSource(origen.getId());
-                        union.setTarget(destino.getId());
+                        unionNmap.setSource(origen.getId());
+                        unionNmap.setTarget(destino.getId());
 
-                        escaneo.getUniones().add(union);
+                        escaneoNmap.getUniones().add(unionNmap);
                     }
                     else {
                         for (int j = 0; j < traceList.getLength(); j++) {
@@ -273,27 +273,27 @@ public class FileSystemStorageService implements StorageService {
                             if (hopList.getLength() == 0) {
                                 Element addressElement = (Element) addressList.item(0);
 
-                                Union union = new Union();
+                                UnionNmap unionNmap = new UnionNmap();
 
-                                Equipo origen = dicEquipos.get("localhost");
-                                Equipo destino = dicEquipos.get(addressElement.getAttribute("addr"));
+                                EquipoNmap origen = dicEquipos.get("localhost");
+                                EquipoNmap destino = dicEquipos.get(addressElement.getAttribute("addr"));
 
-                                union.setSource(origen.getId());
-                                union.setTarget(destino.getId());
+                                unionNmap.setSource(origen.getId());
+                                unionNmap.setTarget(destino.getId());
 
-                                escaneo.getUniones().add(union);
+                                escaneoNmap.getUniones().add(unionNmap);
                             } else if (hopList.getLength() == 1) {
                                 Element hopElement = (Element) hopList.item(0);
 
-                                Union union = new Union();
+                                UnionNmap unionNmap = new UnionNmap();
 
-                                Equipo origen = dicEquipos.get("localhost");
-                                Equipo destino = dicEquipos.get(hopElement.getAttribute("ipaddr"));
+                                EquipoNmap origen = dicEquipos.get("localhost");
+                                EquipoNmap destino = dicEquipos.get(hopElement.getAttribute("ipaddr"));
 
-                                union.setSource(origen.getId());
-                                union.setTarget(destino.getId());
+                                unionNmap.setSource(origen.getId());
+                                unionNmap.setTarget(destino.getId());
 
-                                escaneo.getUniones().add(union);
+                                escaneoNmap.getUniones().add(unionNmap);
                             } else {
                                 Element hopElementAnterior = null;
                                 for (int k = 0; k < hopList.getLength(); k++) {
@@ -302,19 +302,19 @@ public class FileSystemStorageService implements StorageService {
 
                                     // Si no existe este equipo, lo añado
                                     if (!dicEquipos.containsKey(ipActual)) {
-                                        Equipo nuevoEquipo = new Equipo(++idEquipos, ipActual, "", idEquipos*10, idEquipos*10, 0, new ArrayList<>());
-                                        dicEquipos.put(nuevoEquipo.getIp(), nuevoEquipo);
+                                        EquipoNmap nuevoEquipoNmap = new EquipoNmap(++idEquipos, ipActual, "", idEquipos*10, idEquipos*10, 0, new ArrayList<>());
+                                        dicEquipos.put(nuevoEquipoNmap.getIp(), nuevoEquipoNmap);
                                     }
 
-                                    Union union = new Union();
+                                    UnionNmap unionNmap = new UnionNmap();
 
-                                    Equipo origen = dicEquipos.get(k == 0 ? "localhost" : hopElementAnterior.getAttribute("ipaddr"));
-                                    Equipo destino = dicEquipos.get(hopElementActual.getAttribute("ipaddr"));
+                                    EquipoNmap origen = dicEquipos.get(k == 0 ? "localhost" : hopElementAnterior.getAttribute("ipaddr"));
+                                    EquipoNmap destino = dicEquipos.get(hopElementActual.getAttribute("ipaddr"));
 
-                                    union.setSource(origen.getId());
-                                    union.setTarget(destino.getId());
+                                    unionNmap.setSource(origen.getId());
+                                    unionNmap.setTarget(destino.getId());
 
-                                    escaneo.getUniones().add(union);
+                                    escaneoNmap.getUniones().add(unionNmap);
 
                                     hopElementAnterior = hopElementActual;
                                 }
@@ -329,11 +329,11 @@ public class FileSystemStorageService implements StorageService {
         }
 
         // Añadir los equipos al escaneo
-        escaneo.setEquipos(new ArrayList<>(dicEquipos.values()));
+        escaneoNmap.setEquipos(new ArrayList<>(dicEquipos.values()));
 
         // Mostrar escaneo
         // System.out.println(escaneo);
 
-        return escaneo;
+        return escaneoNmap;
     }
 }

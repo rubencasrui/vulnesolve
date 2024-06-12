@@ -43,6 +43,17 @@
         </p>
 
         <p>{{vulnerabilidades.vulnerabilidades.length}} ultimas vulnerabilidades:</p>
+
+        <ngb-pagination
+          class="d-flex justify-content-center mt-2"
+          [collectionSize]="vulnerabilidades.vulnerabilidades.length"
+          [pageSize]="pageSize"
+          [(page)]="page"
+          [maxSize]="5"
+          [rotate]="true"
+          [ellipses]="false"
+          [boundaryLinks]="true"
+        />
         @for (vulnerabilidad of vulnerabilidades.vulnerabilidades | slice: (page - 1) * pageSize : page * pageSize; track $index){
           <div class="card text-center mb-2">
             <div class="card-body">
