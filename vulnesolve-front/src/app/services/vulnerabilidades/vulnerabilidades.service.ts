@@ -3,7 +3,6 @@ import {HttpClient} from "@angular/common/http";
 import {environment} from "../../../environments/environment";
 import {TotalResults} from "../../models/estadistica/total-results";
 import {JsonVulneSolve} from "../../models/vulnerabilidades/json-vulne-solve";
-import {map, Observable, of} from "rxjs";
 import {Estadistica} from "../../models/estadistica/estadistica";
 
 @Injectable({
@@ -17,8 +16,12 @@ export class VulnerabilidadesService {
     private http: HttpClient
   ) { }
 
-  vulnerabilidades(busqueda : string) {
-    return this.http.get<JsonVulneSolve>(this.api + '/nve/vulnerabilidades/'+busqueda);
+  vulnerabilidadesIndividual(busqueda : string) {
+    return this.http.get<JsonVulneSolve>(this.api + '/nve/vulnerabilidades/individual/'+busqueda);
+  }
+
+  vulnerabilidadesMultiples(busqueda : string) {
+    return this.http.get<JsonVulneSolve>(this.api + '/nve/vulnerabilidades/multiple/'+busqueda);
   }
 
   cantidadVulnerabilidades(busqueda : string) {

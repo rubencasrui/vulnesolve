@@ -23,20 +23,44 @@ export class EscanearService {
     return escaneo;
   }
 
-  escaneos() : Observable<String>{
-    var escaneos;
-
-    // @ts-ignore
-    escaneos = this.http.get<String>(this.api+'/media/files', {responseType: 'text'});
-
-    // @ts-ignore
-    return escaneos;
-  }
-
-  escaneo(id : string) : Observable<EscaneoNmap> {
+  escanearEjemplo(id : string) : Observable<EscaneoNmap> {
     var escaneo;
 
     escaneo = this.http.get<EscaneoNmap>(this.api+'/media/escaneo/'+id);
+
+    return escaneo;
+  }
+
+  subirEscaneoEjemplo(formData : FormData) : Observable<EscaneoNmap> {
+    var escaneo;
+
+    escaneo = this.http.post<EscaneoNmap>(this.api+'/media/upload', formData);
+
+    return escaneo;
+  }
+
+  verEscaneosEjempo() : Observable<string[]>{
+    var escaneos;
+
+    escaneos = this.http.get<string[]>(this.api+'/media/files');
+
+    return escaneos;
+  }
+
+  verEscaneoEjemplo(nombre : string) : Observable<File> {
+    var escaneo;
+
+    // @ts-ignore
+    escaneo = this.http.get<File>(this.api+'/media/files/'+nombre, {responseType: 'blob'});
+
+    // @ts-ignore
+    return escaneo;
+  }
+
+  eliminarEscaneoEjemplo(nombre : string) : Observable<void> {
+    var escaneo;
+
+    escaneo = this.http.delete<void>(this.api+'/media/delete/'+nombre);
 
     return escaneo;
   }

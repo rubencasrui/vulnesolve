@@ -1,0 +1,172 @@
+<div class="row">
+  <h1 class="text-center">Administración</h1>
+
+  <div class="col-md-6 col-xs-12 mb-2">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="text-center">Puertos</h2>
+
+        <div class="d-flex justify-content-center mb-2">
+          <button class="btn btn-primary" routerLink="/crear-puerto">Crear nuevo Puerto</button>
+        </div>
+
+        <div class="d-flex  justify-content-center mb-2">
+          <label for="numero">Selecciona un puerto: </label>
+          <select id="numero" class="custom-select" [(ngModel)]="numero">
+            @if (puertos.length === 0) {
+              <option value="" disabled>Sin resultados</option>
+            }
+            @for (puerto of puertos; track $index) {
+              <option value="{{puerto.numero}}" >{{puerto.numero}}: {{puerto.servicio}}</option>
+            }
+          </select>
+        </div>
+
+        <div class="d-flex  justify-content-center mb-2">
+          <button class="btn btn-success" routerLink="/puerto/{{numero}}" [disabled]="!numero">Ver Puerto {{numero}}</button>
+        </div>
+
+        <div class="d-flex  justify-content-center mb-2">
+          <button class="btn btn-warning" routerLink="/editar-puerto/{{numero}}" [disabled]="!numero">Editar Puerto {{numero}}</button>
+        </div>
+
+        <div class="d-flex  justify-content-center mb-2">
+          <button class="btn btn-danger" (click)="abrirModalEliminarPuerto(modalEliminarPuerto)" [disabled]="!numero">Eliminar Puerto {{numero}}</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-xs-12 mb-2">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="text-center">Vulnerabilidades</h2>
+
+        <div class="d-flex justify-content-center mb-2">
+          <button class="btn btn-primary" routerLink="/crear-configuracion-api">Crear Configuración de nueva Api</button>
+        </div>
+
+        <div class="d-flex  justify-content-center mb-2">
+          <label for="configuracion">Selecciona una configuracion: </label>
+          <select id="configuracion" class="custom-select" [(ngModel)]="configuracion">
+            @if (configuraciones.length === 0) {
+              <option value="" disabled>Sin resultados</option>
+            }
+            @for (config of configuraciones; track $index) {
+              <option value="{{config.nombre}}" >{{config.nombre}}</option>
+            }
+          </select>
+        </div>
+
+        <div class="d-flex  justify-content-center mb-2">
+          <button class="btn btn-success" routerLink="/configuracion-api/{{configuracion}}" [disabled]="!configuracion">Ver Configuración {{configuracion}}</button>
+        </div>
+
+        <div class="d-flex  justify-content-center mb-2">
+          <button class="btn btn-warning" routerLink="/editar-configuracion-api/{{configuracion}}" [disabled]="!configuracion">Editar Configuración {{configuracion}}</button>
+        </div>
+
+        <div class="d-flex  justify-content-center mb-2">
+          <button class="btn btn-danger" (click)="abrirModalEliminarConfiguracion(modalEliminarConfiguracion)" [disabled]="!configuracion">Eliminar Configuración {{configuracion}}</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-xs-12 mb-2">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="text-center">Archivos</h2>
+
+        <form (ngSubmit)="subirEscaneoEjemplo()" #escanearForm="ngForm" class="mb-4">
+          <div class="form-group">
+            <div class="row justify-content-center">
+              <div class="d-flex justify-content-center mb-2">
+                <label for="xml" class="form-label">Archivo XML de nmap:</label>
+              </div>
+              <div class="d-flex justify-content-center mb-2">
+                <input type="file" accept=".xml" class="form-control" id="xml" name="xml" (change)="getFile($event)" >
+              </div>
+              <div class="d-flex justify-content-center mb-2">
+                <button type="submit" class="btn btn-primary" [disabled]="!escanearForm.valid">Subir nuevo escaneo de ejemplo</button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <div class="d-flex  justify-content-center mb-2">
+          <label for="escaneoEjemplo">Selecciona un escaneo: </label>
+          <select id="escaneoEjemplo" class="custom-select" [(ngModel)]="escaneoEjemplo">
+            @if (escaneosEjemplo.length === 0) {
+              <option value="" disabled>Sin resultados</option>
+            }
+            @for (escaneo of escaneosEjemplo; track $index) {
+              <option value="{{escaneo}}" >{{escaneo}}</option>
+            }
+          </select>
+        </div>
+
+        <div class="d-flex  justify-content-center mb-2">
+          <button class="btn btn-success" (click)="verEscaneoEjemplo()" [disabled]="!escaneoEjemplo">Ver Escaneo {{escaneoEjemplo}}</button>
+        </div>
+
+        <div class="d-flex  justify-content-center mb-2">
+          <button class="btn btn-danger" (click)="abrirModalEliminarEscaneoEjemplo(modalEliminarEscaneoEjemplo)" [disabled]="!escaneoEjemplo">Eliminar Escaneo {{escaneoEjemplo}}</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<ng-template #modalEliminarEscaneoEjemplo let-modalEscaneoEjemplo>
+  <div class="modal-header">
+    <h4 class="modal-title">Eliminar escaneo {{escaneoEjemplo}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modalEscaneoEjemplo.close('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <p>¿Está seguro de que desea eliminar el escaneo?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modalEscaneoEjemplo.close('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-danger" (click)="eliminarEscaneoEjemplo();modalEscaneoEjemplo.close('Close click')">Eliminar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalEliminarPuerto let-modalPuerto>
+  <div class="modal-header">
+    <h4 class="modal-title">Eliminar puerto {{numero}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modalPuerto.close('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <p>¿Está seguro de que desea eliminar el puerto?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modalPuerto.close('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-danger" (click)="eliminarPuerto();modalPuerto.close('Close click')">Eliminar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalEliminarConfiguracion let-modalConfiguracion>
+  <div class="modal-header">
+    <h4 class="modal-title">Eliminar configuración {{configuracion}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modalConfiguracion.close('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <p>¿Está seguro de que desea eliminar la configuración?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modalConfiguracion.close('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-danger" (click)="eliminarConfiguracion();modalConfiguracion.close('Close click')">Eliminar</button>
+  </div>
+</ng-template>
+
+
+@if (show) {
+  <ngb-toast header="Mensaje" [autohide]="false" (hidden)="show = false" class="position-fixed bottom-0 end-0 m-2">
+    {{mensaje}}
+  </ngb-toast>
+}

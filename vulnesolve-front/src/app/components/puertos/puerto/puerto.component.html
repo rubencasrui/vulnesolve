@@ -1,0 +1,18 @@
+<h2 class="text-center">Puerto: {{numero}}</h2>
+
+@if (encontrado){
+  <div class="row">
+    <div class="card mb-2">
+      <div class="card-body">
+        <p class="card-subtitle mb-2 text-muted">servicio: {{ puerto.servicio }}</p>
+        <p class="card-text">{{ puerto.descripcion }}</p>
+        <a class="card-link" routerLink="/vulnerabilidades/{{puerto.servicio}}">ver vulnerabilidades</a>
+      </div>
+    </div>
+  </div>
+}
+@else {
+  <div class="alert alert-danger text-center" role="alert">
+    No se ha encontrado un puerto con este número.
+  </div>
+}

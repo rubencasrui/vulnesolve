@@ -18,17 +18,19 @@ public class ConfiguracionApi {
     private int cantidadResultados;
     private int modoBusqueda;
     private boolean soloCriticos;
+    private int incrementoIndice;
 
     public ConfiguracionApi() {
 
     }
 
-    public ConfiguracionApi(Long id, String nombre, int cantidadResultados, int modoBusqueda, boolean soloCriticos) {
+    public ConfiguracionApi(Long id, String nombre, int cantidadResultados, int modoBusqueda, boolean soloCriticos, int incrementoIndice) {
         this.id = id;
         this.nombre = nombre;
         this.cantidadResultados = cantidadResultados;
         this.modoBusqueda = modoBusqueda;
         this.soloCriticos = soloCriticos;
+        this.incrementoIndice = incrementoIndice;
     }
 
     public Long getId() {
@@ -69,6 +71,14 @@ public class ConfiguracionApi {
 
     public void setSoloCriticos(boolean soloCriticos) {
         this.soloCriticos = soloCriticos;
+    }
+
+    public int getIncrementoIndice() {
+        return incrementoIndice;
+    }
+
+    public void setIncrementoIndice(int incrementoIndice) {
+        this.incrementoIndice = incrementoIndice;
     }
 
 }

@@ -2,15 +2,17 @@ package com.uma.vulnesolve.models.dto;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 public class Puerto {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private int numero;
-    @Column(length = 16)
-    private String nombre;
+    private Integer numero;
+
+    @Column(length = 16, nullable = false)
+    private String servicio;
+
     @Column(length = 1024)
     private String descripcion;
 
@@ -18,19 +20,10 @@ public class Puerto {
 
     }
 
-    public Puerto(Long id, int numero, String nombre, String descripcion) {
-        this.id = id;
+    public Puerto(int numero, String servicio, String descripcion) {
         this.numero = numero;
-        this.nombre = nombre;
+        this.servicio = servicio;
         this.descripcion = descripcion;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public int getNumero() {
@@ -41,12 +34,12 @@ public class Puerto {
         this.numero = numero;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getServicio() {
+        return servicio;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setServicio(String servicio) {
+        this.servicio = servicio;
     }
 
     public String getDescripcion() {

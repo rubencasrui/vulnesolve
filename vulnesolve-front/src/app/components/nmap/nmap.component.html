@@ -33,15 +33,20 @@
     @if (escaneo.equipos.length > 0){
       <h2 class="text-center mb-4">Topología de la red:</h2>
     }
-    <figure></figure>
+    <figure id="topologia"></figure>
     @if (escaneo.equipos.length > 0){
+      <div class="row align-items-center mb-2">
+        <div class="col text-center">
+          <button id="descargar" class="btn btn-primary">Descargar topología</button>
+        </div>
+      </div>
       <h2 class="text-center mb-4">Equipos:</h2>
       <div class="row justify-content-center">
         <div class="col-auto">
           @for (equipo of escaneo.equipos.sort(compareEquipos) | slice: 1 : escaneo.equipos.length; track $index){
-            <div class="card text-center mb-2">
+            <div class="card text-center mb-2" id="equipo-{{equipo.id}}">
               <div class="card-body">
-                <h5 class="card-title">EquipoNmap {{equipo.id}}</h5>
+                <h5 class="card-title">Equipo {{equipo.id}}</h5>
                 <p class="card-text">Dirección IP: {{equipo.ip}}</p>
                 @if (equipo.mac.length > 0){<p class="card-text">Dirección MAC: {{equipo.mac}}</p>}
                 <p class="card-text">Puertos abiertos: {{equipo.puertos.length}}</p>
@@ -131,23 +136,12 @@
       </ngb-rating>
     </p>
 
-
     @if (vulnerabilidades.vulnerabilidades.length > 0){
       <p>{{vulnerabilidades.vulnerabilidades.length}} ultimas vulnerabilidades:</p>
-      <ngb-pagination
-        class="d-flex justify-content-center mt-2"
-        [collectionSize]="vulnerabilidades.vulnerabilidades.length"
-        [pageSize]="pageSize"
-        [(page)]="page"
-        [maxSize]="5"
-        [rotate]="true"
-        [ellipses]="false"
-        [boundaryLinks]="true"
-      />
       @for (vulnerabilidad of vulnerabilidades.vulnerabilidades | slice: (page - 1) * pageSize : page * pageSize; track $index){
         <div class="card text-center mb-2">
           <div class="card-body">
-            <h5 class="card-title">{{vulnerabilidad.id}} <a href="https://nvd.nist.gov/vuln/detail/{{vulnerabilidad.id}}" target="_blank"><fa-icon [icon]="faArrowUpRightFromSquare" alt="ver mas"></fa-icon></a></h5>
+            <h5 class="card-title">{{vulnerabilidad.id}} <a href="https://nvd.nist.gov/vuln/detail/{{vulnerabilidad.id}}" target="_blank"><fa-icon [icon]="enlace" alt="ver mas"></fa-icon></a></h5>
             <p class="card-text">{{vulnerabilidad.descripcion}}</p>
             @if (vulnerabilidad.severidades.length > 0){
               <div class="card text-center mb-2">
@@ -231,9 +225,12 @@
       />
     }
   </div>
-  <!--
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="modal.close('Close click')">Close</button>
-  </div>
-  -->
 </ng-template>
+
+<div class="position-fixed bottom-0 end-0 m-2">
+  <button class="btn btn-primary" (click)="scrollToTop()">
+    <fa-icon [icon]="topologia"></fa-icon>
+    <br>
+    <fa-icon [icon]="subir"></fa-icon>
+  </button>
+</div>

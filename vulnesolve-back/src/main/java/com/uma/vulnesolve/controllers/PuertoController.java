@@ -23,9 +23,24 @@ public class PuertoController {
 
     @PostMapping("/puerto")
     public ResponseEntity<Puerto> crearPuerto(@RequestBody Puerto puerto) {
-        Puerto puertoCreado = puertoService.crearPuerto(puerto);
+        Optional<Puerto> puertoDado = puertoService.buscarPorNumero(puerto.getNumero());
 
-        ResponseEntity<Puerto> respuesta = new ResponseEntity<>(puertoCreado, HttpStatus.CREATED);
+        ResponseEntity<Puerto> respuesta;
+
+        if(puertoDado.isPresent()) {
+            respuesta = new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        else {
+            try {
+                Puerto puertoCreado = puertoService.crearPuerto(puerto);
+                respuesta = new ResponseEntity<>(puertoCreado, HttpStatus.CREATED);
+            }
+            catch(Exception e) {
+                System.out.println("Error al crear el puerto: " + e.getMessage());
+                respuesta = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+
+        }
 
         return respuesta;
     }
@@ -41,14 +56,14 @@ public class PuertoController {
         return respuesta;
     }
 
-    @GetMapping("/puerto/{id}")
-    public ResponseEntity<Puerto> buscarPorId(@PathVariable Long id) {
-        Optional<Puerto> puerto = puertoService.buscarPorId(id);
+    @GetMapping("/puerto/{numero}")
+    public ResponseEntity<Puerto> buscarPorNumero(@PathVariable int numero) {
+        Optional<Puerto> puertos = puertoService.buscarPorNumero(numero);
 
         ResponseEntity<Puerto> respuesta;
 
-        if(puerto.isPresent()) {
-            respuesta = new ResponseEntity<>(puerto.get(), HttpStatus.OK);
+        if(puertos.isPresent()) {
+            respuesta = new ResponseEntity<>(puertos.get(), HttpStatus.OK);
         }
         else {
             respuesta = new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -57,18 +72,9 @@ public class PuertoController {
         return respuesta;
     }
 
-    @GetMapping("/puertos/numero/{numero}")
-    public ResponseEntity<List<Puerto>> buscarPorNumero(@PathVariable int numero) {
-        List<Puerto> puertos = puertoService.buscarPorNumero(numero);
-
-        ResponseEntity<List<Puerto>> respuesta = new ResponseEntity<>(puertos, HttpStatus.OK);
-
-        return respuesta;
-    }
-
-    @GetMapping("/puertos/nombre/{nombre}")
-    public ResponseEntity<List<Puerto>> buscarPorNombre(@PathVariable String nombre) {
-        List<Puerto> puertos = puertoService.buscarPorNombre(nombre);
+    @GetMapping("/puertos/{servicio}")
+    public ResponseEntity<List<Puerto>> buscarPorServicio(@PathVariable String servicio) {
+        List<Puerto> puertos = puertoService.buscarPorServicio(servicio);
 
         ResponseEntity<List<Puerto>> respuesta = new ResponseEntity<>(puertos, HttpStatus.OK);
 
@@ -77,17 +83,23 @@ public class PuertoController {
 
     // UPDATE
 
-    @PutMapping("/puerto/{id}")
-    public ResponseEntity<Puerto> actualizarPuerto(@PathVariable Long id, @RequestBody Puerto puerto) {
-        Optional<Puerto> puertoActual = puertoService.buscarPorId(id);
+    @PutMapping("/puerto/{numero}")
+    public ResponseEntity<Puerto> actualizarPuerto(@PathVariable int numero, @RequestBody Puerto puerto) {
+        puerto.setNumero(numero);
+        Optional<Puerto> puertoDado = puertoService.buscarPorNumero(puerto.getNumero());
 
         ResponseEntity<Puerto> respuesta;
 
-        if(puertoActual.isPresent()) {
-            puerto.setId(id);
-            Puerto puertoActualizado = puertoService.actualizarPuerto(puerto);
+        if(puertoDado.isPresent()) {
+            try {
+                Puerto puertoActualizado = puertoService.actualizarPuerto(puerto);
 
-            respuesta = new ResponseEntity<>(puertoActualizado, HttpStatus.OK);
+                respuesta = new ResponseEntity<>(puertoActualizado, HttpStatus.CREATED);
+            }
+            catch(Exception e) {
+                System.out.println("Error al actualizar el puerto: " + e.getMessage());
+                respuesta = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         }
         else {
             respuesta = new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -98,14 +110,14 @@ public class PuertoController {
 
     // DELETE
 
-    @DeleteMapping("/puerto/{id}")
-    public ResponseEntity<Void> eliminarPuerto(@PathVariable Long id) {
-        Optional<Puerto> puerto = puertoService.buscarPorId(id);
+    @DeleteMapping("/puerto/{numero}")
+    public ResponseEntity<Void> eliminarPuerto(@PathVariable int numero) {
+        Optional<Puerto> puertoDado = puertoService.buscarPorNumero(numero);
 
         ResponseEntity<Void> respuesta;
 
-        if(puerto.isPresent()) {
-            puertoService.eliminarPuerto(id);
+        if(puertoDado.isPresent()) {
+            puertoService.eliminarPuerto(numero);
 
             respuesta = new ResponseEntity<>(HttpStatus.OK);
         }

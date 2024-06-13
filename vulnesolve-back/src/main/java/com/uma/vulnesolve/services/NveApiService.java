@@ -1,5 +1,6 @@
 package com.uma.vulnesolve.services;
 
+import com.uma.vulnesolve.models.dto.ConfiguracionApi;
 import com.uma.vulnesolve.models.vulnerabilidades.estadistica.TotalResults;
 import com.uma.vulnesolve.models.vulnerabilidades.nve.*;
 import com.uma.vulnesolve.models.vulnerabilidades.vulnesolve.JsonVulneSolve;
@@ -8,81 +9,129 @@ import com.uma.vulnesolve.models.vulnerabilidades.vulnesolve.Vulnerabilidad;
 import com.uma.vulnesolve.repositories.NveApiRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class NveApiService {
 
-    public static final double INCREMENTO_POR_ACTUALIDAD = 0.2;
     private NveApiRepository nveApiRepository;
 
-    public NveApiService(NveApiRepository nveApiRepository) {
+    private ConfiguracionApiService configuracionApiService;
+
+    public NveApiService(NveApiRepository nveApiRepository, ConfiguracionApiService configuracionApiService) {
         this.nveApiRepository = nveApiRepository;
+
+        this.configuracionApiService = configuracionApiService;
     }
 
     public JsonNve getVulnerabilities(String keywordSearch) {
         return nveApiRepository.getVulnerabilidades(keywordSearch).block();
     }
 
-    public JsonVulneSolve getVulnerabilidadesOld(String keywordSearch) {
-        JsonNve peticion = nveApiRepository.getVulnerabilidades(keywordSearch).block();
+    private ConfiguracionApi obtenerConfiguracionApi(String nombre) {
+        Optional<ConfiguracionApi> configuracionApi = configuracionApiService.buscarPorNombre(nombre);
+        ConfiguracionApi config = new ConfiguracionApi(0L, "PREDETERMINADA", 10, 2, false, 20);
 
-        JsonVulneSolve respuesta = new JsonVulneSolve();
+        if (configuracionApi.isPresent()) {
+            config = configuracionApi.get();
+        }
 
-        respuesta = transformar(peticion, respuesta);
-        respuesta.setNombre(keywordSearch);
-
-        return respuesta;
+        return config;
     }
 
-    public JsonVulneSolve getVulnerabilidades(String keywordSearch) {
+    public JsonVulneSolve getVulnerabilidadesIndividuales(String keywordSearch) {
+        return getVulnerabilidades(keywordSearch, obtenerConfiguracionApi("NVD-INDIVIDUAL"));
+    }
+
+    public JsonVulneSolve getVulnerabilidadesMultiple(String keywordSearch) {
+        return getVulnerabilidades(keywordSearch, obtenerConfiguracionApi("NVD-MULTIPLE"));
+    }
+
+    public JsonVulneSolve getVulnerabilidades(String keywordSearch, ConfiguracionApi configuracionApi) {
         long inicio = 0;
         long fin = 0;
         double tiempoTotalResults = 0;
         double tiempoPeticion = 0;
         double tiempoTransformar = 0;
 
-        inicio = (new Date()).getTime();
-        int totalResultados = nveApiRepository.getEstadisticaVulnerabilidad(keywordSearch).block().getTotalResults();
-        fin = (new Date()).getTime();
-        tiempoTotalResults = (double) (fin - inicio) /1000;
-
         JsonNve peticion = new JsonNve();
         JsonVulneSolve respuesta = new JsonVulneSolve();
-        int resultPerPage = 2000;
 
+        int resultPerPage = configuracionApi.getCantidadResultados();
+        int modo = configuracionApi.getModoBusqueda();
 
-        inicio = (new Date()).getTime();
-        if (totalResultados > 0){
-            if (totalResultados > resultPerPage) {
-                int opcion = 1;
-                if (opcion == 1){
+        if (modo == 1) {
+            // Modo 1: Se obtienen todos los resultados mas antiguos. De indice 0 a resultPerPage
+            System.out.println("Modo 1");
+
+            inicio = (new Date()).getTime();
+            peticion = nveApiRepository.getVulnerabilidadesParam(keywordSearch, resultPerPage+"", 0+"").block();
+            fin = (new Date()).getTime();
+
+            tiempoPeticion = (double) (fin - inicio) /1000;
+        }
+        else if (modo == 2) {
+            // Modo 2: Se obtienen todos los resultados mas recientes. De indice totalResults-resultPerPage a totalResults
+            System.out.println("Modo 2");
+
+            // Se calcula la cantidad de vulnerabilidades
+            inicio = (new Date()).getTime();
+            int totalResultados = nveApiRepository.getEstadisticaVulnerabilidad(keywordSearch).block().getTotalResults();
+            fin = (new Date()).getTime();
+            tiempoTotalResults = (double) (fin - inicio) /1000;
+
+            // Se obtienen las vulnerabilidades si hay alguna
+            inicio = (new Date()).getTime();
+            if (totalResultados > 0){
+                if (totalResultados > resultPerPage) {
+                    // Si hay más vulnerabilidades que resultados a mostrar, se calcula el indice por el que empezar.
                     peticion = nveApiRepository.getVulnerabilidadesParam(keywordSearch, resultPerPage+"", (totalResultados-resultPerPage)+"").block();
                 }
-                else if(opcion == 2){
-                    peticion = nveApiRepository.getVulnerabilidadesParam(keywordSearch, resultPerPage+"", 0+"").block();
-                    System.out.println("Cantidad de vulnerabilidades: " + peticion.getVulnerabilities().size());
-                    while(peticion.getVulnerabilities().size()<totalResultados){
-                        peticion.getVulnerabilities().addAll(
-                                nveApiRepository.getVulnerabilidadesParam(keywordSearch, resultPerPage+"", peticion.getVulnerabilities().size()+"").block().getVulnerabilities()
-                        );
-                        System.out.println("Cantidad de vulnerabilidades: " + peticion.getVulnerabilities().size());
-                    }
+                else {
+                    // Si hay menos vulnerabilidades que resultados a mostrar, se obtienen todas las vulnerabilidades.
+                    peticion = nveApiRepository.getVulnerabilidadesParam(keywordSearch, totalResultados+"", 0+"").block();
                 }
             }
-            else {
-                peticion = nveApiRepository.getVulnerabilidades(keywordSearch).block();
-            }
+            fin = (new Date()).getTime();
+            tiempoPeticion = (double) (fin - inicio) /1000;
         }
-        fin = (new Date()).getTime();
-        tiempoPeticion = (double) (fin - inicio) /1000;
+        else if (modo == 3) {
+            // Modo 3: Se obtienen todos los resultados
+            System.out.println("Modo 3");
+
+            // Se obtienen todas las vulnerabilidades hasta la cantidad asignada a resultPerPage
+            inicio = (new Date()).getTime();
+            peticion = nveApiRepository.getVulnerabilidadesParam(keywordSearch, resultPerPage+"", 0+"").block();
+            // Se calcula la cantidad de vulnerabilidades
+            int totalResultados = peticion.getTotalResults();
+            fin = (new Date()).getTime();
+
+            tiempoTotalResults = (double) (fin - inicio) /1000;
+
+            // Iterar hasta obtener todas las vulnerabilidades
+            inicio = (new Date()).getTime();
+            if (totalResultados > resultPerPage) {
+                resultPerPage = 2000;
+            }
+            while(peticion.getVulnerabilities().size()<totalResultados){
+                peticion.getVulnerabilities().addAll(
+                    nveApiRepository.getVulnerabilidadesParam(keywordSearch, resultPerPage+"", peticion.getVulnerabilities().size()+"").block().getVulnerabilities()
+                );
+            }
+
+            fin = (new Date()).getTime();
+            tiempoPeticion = (double) (fin - inicio) /1000;
+        }
+        else {
+            System.out.println("Modo " + modo + " de búsqueda no válido");
+        }
 
         respuesta.setNombre(keywordSearch);
 
         inicio = (new Date()).getTime();
-        respuesta = transformar(peticion, respuesta);
+        respuesta = transformar(peticion, respuesta, configuracionApi);
         fin = (new Date()).getTime();
         tiempoTransformar = (double) (fin - inicio) /1000;
 
@@ -103,7 +152,7 @@ public class NveApiService {
         return nveApiRepository.getEstadisticaV3(severity).block();
     }
 
-    private JsonVulneSolve transformar(JsonNve peticion, JsonVulneSolve respuesta) {
+    private JsonVulneSolve transformar(JsonNve peticion, JsonVulneSolve respuesta, ConfiguracionApi configuracionApi) {
 
         respuesta.setResultados(peticion.getTotalResults());
 
@@ -114,15 +163,12 @@ public class NveApiService {
         int cantidad30 = 0;
         int cantidad31 = 0;
         int cantidadActuales = 0;
+        boolean soloCriticos = configuracionApi.isSoloCriticos();
 
         int cantidadVulnerabilidades = peticion.getVulnerabilities().size();
         for(int i = 0; i < cantidadVulnerabilidades; i++){
             Vulnerabilities vulne = peticion.getVulnerabilities().get(i);
             Vulnerabilidad vulnerabilidad = new Vulnerabilidad();
-
-            if (cantidadVulnerabilidades - i <= 2000){
-            }
-            respuesta.getVulnerabilidades().add(vulnerabilidad);
 
             Cve cve = vulne.getCve();
             vulnerabilidad.setId(vulne.getCve().getId());
@@ -149,6 +195,8 @@ public class NveApiService {
             if (ponderacion>1){
                 cantidadActuales++;
             }
+
+            boolean esCritico = false;
 
             Metrics metrics = vulne.getCve().getMetrics();
             List<CvssMetricV20> cvssMetricV2 = metrics.getCvssMetricV2();
@@ -179,6 +227,10 @@ public class NveApiService {
 
                     puntuacion30 += ponderacion * severidad.getValor();
                     cantidad30 += ponderacion;
+
+                    if (severidad.getSeverity().equals("CRITICAL")) {
+                        esCritico = true;
+                    }
                 }
             }
             List<CvssMetricV3X> cvssMetricV31 = metrics.getCvssMetricV31();
@@ -194,7 +246,21 @@ public class NveApiService {
 
                     puntuacion31 += ponderacion * severidad.getValor();
                     cantidad31 += ponderacion;
+
+                    if (severidad.getSeverity().equals("CRITICAL")) {
+                        esCritico = true;
+                    }
                 }
+            }
+
+            if (soloCriticos){
+                if (esCritico){
+                    respuesta.getVulnerabilidades().add(vulnerabilidad);
+                }
+            }
+            else {
+                respuesta.getVulnerabilidades().add(vulnerabilidad);
+
             }
 
         }
@@ -204,9 +270,10 @@ public class NveApiService {
             puntuacion += (puntuacion20 + puntuacion30 + puntuacion31 ) / (cantidad20 + cantidad30 + cantidad31);
         }
 
+        double incrementoIndice = configuracionApi.getIncrementoIndice()/100.0;
 
         if (respuesta.getVulnerabilidades().size()>0) {
-            puntuacion = puntuacion * (1 + ((double) cantidadActuales / respuesta.getVulnerabilidades().size()) * INCREMENTO_POR_ACTUALIDAD);
+            puntuacion = puntuacion * (1 + ((double) cantidadActuales / respuesta.getVulnerabilidades().size()) * incrementoIndice);
             if (puntuacion > 10)
                 puntuacion = 10;
         }

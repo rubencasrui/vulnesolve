@@ -17,7 +17,6 @@ export class EstadisticasV2Component {
   private margin =  50;
   private width  = 500;
   private height = 500;
-  // The radius of the pie chart is half the smallest side
   private radius = Math.min(this.width, this.height) / 2 - this.margin;
   private colors : any;
 
@@ -76,6 +75,43 @@ export class EstadisticasV2Component {
       .style("font-size", "16px")
       .style("font-weight", "bold")
       .text("Vulnerabilidades con Severidad 2.0");
+
+    // Añadir el total
+    d3.select("figure#pie2 svg")
+      .append("text")
+      .attr("x", this.width / 2)
+      .attr("y", this.height - this.margin/8)
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .text("Vulnerabilidades en total: "+this.severidadesV2.reduce((a, b) => a + b.cantidad, 0));
+
+    // Añadir la leyenda
+    d3.select("figure#pie2 svg")
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 20)
+      .attr("fill", "#ffdb4d")
+      .style("font-weight", "bold")
+      .style("font-size", "20px")
+      .text("· " + (this.severidadesV2[0].cantidad/this.severidadesV2.reduce((a, b) => a + b.cantidad, 0)*100).toFixed(0) + "% BAJA");
+
+    d3.select("figure#pie2 svg")
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 20*2)
+      .attr("fill", "#ffaa00")
+      .style("font-weight", "bold")
+      .style("font-size", "20px")
+      .text("· " + (this.severidadesV2[1].cantidad/this.severidadesV2.reduce((a, b) => a + b.cantidad, 0)*100).toFixed(0) + "% MEDIA");
+
+    d3.select("figure#pie2 svg")
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 20*3)
+      .attr("fill", "#ff5f5f")
+      .style("font-weight", "bold")
+      .style("font-size", "20px")
+      .text("· " + (this.severidadesV2[2].cantidad/this.severidadesV2.reduce((a, b) => a + b.cantidad, 0)*100).toFixed(0) + "% ALTA");
   }
 
   private createColors(): void {
@@ -100,11 +136,11 @@ export class EstadisticasV2Component {
       )
       .attr('fill', (d: any, i: any) => (this.colors(i)))
       .attr("stroke", "#121926")
-      .style("stroke-width", "1px");
+      .style("stroke-width", "0.25px");
 
     // Add labels
     const labelLocation = d3.arc()
-      .innerRadius(100)
+      .innerRadius(this.radius/4)
       .outerRadius(this.radius);
 
     this.svg
@@ -112,9 +148,9 @@ export class EstadisticasV2Component {
       .data(pie(this.severidadesV2))
       .enter()
       .append('text')
-      .text((d: any)=> d.data.indice + ": " + d.data.cantidad)
+      .text((d: any)=> "←" + d.data.cantidad)
       .attr("transform", (d: any) => "translate(" + labelLocation.centroid(d) + ")")
-      .style("text-anchor", "middle");
+      .style("font-weight", "bold");
   }
 
 }

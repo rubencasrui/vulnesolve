@@ -31,9 +31,14 @@ public class NveApiController {
         return nveApiService.getVulnerabilities(keywordSearch);
     }
 
-    @RequestMapping("/vulnerabilidades/{keywordSearch}")
-    public JsonVulneSolve getVulnerabilidades(@PathVariable String keywordSearch) {
-        return nveApiService.getVulnerabilidades(keywordSearch);
+    @RequestMapping("/vulnerabilidades/individual/{keywordSearch}")
+    public JsonVulneSolve getVulnerabilidadesIndviduales(@PathVariable String keywordSearch) {
+        return nveApiService.getVulnerabilidadesIndividuales(keywordSearch);
+    }
+
+    @RequestMapping("/vulnerabilidades/multiple/{keywordSearch}")
+    public JsonVulneSolve getVulnerabilidadesMultiples(@PathVariable String keywordSearch) {
+        return nveApiService.getVulnerabilidadesMultiple(keywordSearch);
     }
 
     @RequestMapping("/estadisticas/vulnerabilidades/{keywordSearch}")

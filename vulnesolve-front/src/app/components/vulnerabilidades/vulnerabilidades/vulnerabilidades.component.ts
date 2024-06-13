@@ -5,7 +5,8 @@ import {
   faArrowUpRightFromSquare,
   faBarsProgress,
   faRectangleList,
-  faSearch, faSpinner
+  faSearch,
+  faSpinner
 } from "@fortawesome/free-solid-svg-icons";
 import {NgbPagination, NgbRating} from "@ng-bootstrap/ng-bootstrap";
 import {SlicePipe} from "@angular/common";
@@ -67,7 +68,7 @@ export class VulnerabilidadesComponent {
 
     console.log("cargando vulnerabilidades " + this.servicio);
     this.cargando = true;
-    this.vulnerabilidadesService.vulnerabilidades(this.servicio)
+    this.vulnerabilidadesService.vulnerabilidadesIndividual(this.servicio)
       .subscribe(vulnerabilidades => {
         this.vulnerabilidades = vulnerabilidades;
         this.cargando = false;

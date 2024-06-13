@@ -28,16 +28,12 @@ public class PuertoService {
         return puertoRepository.findAll();
     }
 
-    public Optional<Puerto> buscarPorId(Long id) {
-        return puertoRepository.findById(id);
+    public Optional<Puerto> buscarPorNumero(int numero) {
+        return puertoRepository.findById(numero);
     }
 
-    public List<Puerto> buscarPorNumero(int numero) {
-        return puertoRepository.buscarPorNumero(numero);
-    }
-
-    public List<Puerto> buscarPorNombre(String nombre) {
-        return puertoRepository.buscarPorNombre(nombre);
+    public List<Puerto> buscarPorServicio(String servicio) {
+        return puertoRepository.findByServicio(servicio);
     }
 
     // UPDATE
@@ -48,8 +44,8 @@ public class PuertoService {
 
     // DELETE
 
-    public void eliminarPuerto(Long id) {
-        puertoRepository.deleteById(id);
+    public void eliminarPuerto(int numero) {
+        puertoRepository.deleteById(numero);
     }
 
 }

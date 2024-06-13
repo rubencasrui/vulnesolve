@@ -1,0 +1,43 @@
+<h2 class="text-center">Configuración: {{nombre}}</h2>
+
+@if (encontrado){
+  <div class="row">
+    <div class="card mb-2">
+      <div class="card-body">
+        <p class="card-subtitle mb-2 text-muted">Api: {{ configuracion.nombre }}</p>
+        <p class="card-text">Cantidad de resultados a mostrar: {{ configuracion.cantidadResultados }}.</p>
+        @switch (configuracion.modoBusqueda) {
+          @case (1) {
+            <p class="card-text">Modo de búsqueda: 1, Resultados más antiguos. Velocidad: rápida.</p>
+          }
+          @case (2) {
+            <p class="card-text">Modo de búsqueda: 2, Resultados más recientes. Velocidad: moderada.</p>
+          }
+          @case (3) {
+            <p class="card-text">Modo de búsqueda: 3, Todos los resultaods. Velocidad: lenta.</p>
+          }
+          @default {
+            <p class="card-text">Modo de búsqueda {{configuracion.modoBusqueda}}: No definido.</p>
+          }
+        }
+        @switch (configuracion.soloCriticos){
+          @case (true) {
+            <p class="card-text">Solo críticos: Activado.</p>
+          }
+          @case (false) {
+            <p class="card-text">Solo críticos: Desactivado.</p>
+          }
+          @default {
+            <p class="card-text">Solo mostrar vulnerabilidades críticas: No definido</p>
+          }
+        }
+        <p class="card-text">Incremento de indice: {{configuracion.incrementoIndice}}</p>
+      </div>
+    </div>
+  </div>
+}
+@else {
+  <div class="alert alert-danger text-center" role="alert">
+    No se ha encontrado una configuración con este nombre.
+  </div>
+}

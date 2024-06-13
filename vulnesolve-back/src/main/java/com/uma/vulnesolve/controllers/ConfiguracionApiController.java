@@ -23,17 +23,23 @@ public class ConfiguracionApiController {
 
     @PostMapping("/configuracionApi")
     public ResponseEntity<ConfiguracionApi> crearConfiguracionApi(@RequestBody ConfiguracionApi configuracionApi) {
-        Optional<ConfiguracionApi> conf = configuracionApiService.buscarPorNombre(configuracionApi.getNombre());
+        Optional<ConfiguracionApi> confDada = configuracionApiService.buscarPorNombre(configuracionApi.getNombre());
 
         ResponseEntity<ConfiguracionApi> response;
 
-        if (conf.isPresent()) {
+        if (confDada.isPresent()) {
             response = new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         else {
-            ConfiguracionApi confCreada = configuracionApiService.crearConfiguracionApi(configuracionApi);
+            try {
+                ConfiguracionApi confCreada = configuracionApiService.crearConfiguracionApi(configuracionApi);
 
-            response = new ResponseEntity<>(confCreada, HttpStatus.CREATED);
+                response = new ResponseEntity<>(confCreada, HttpStatus.CREATED);
+            }
+            catch (Exception e) {
+                System.out.println("Error al crear la configuración: " + e.getMessage());
+                response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         }
 
         return response;
@@ -82,17 +88,24 @@ public class ConfiguracionApiController {
 
     // UPDATE
 
-    @PutMapping("/configuracionApi/{id}")
-    public ResponseEntity<ConfiguracionApi> actualizarConfiguracionApi(@PathVariable Long id, @RequestBody ConfiguracionApi configuracionApi) {
-        Optional<ConfiguracionApi> configuracionActual = configuracionApiService.buscarPorId(id);
+    @PutMapping("/configuracionApi/{nombre}")
+    public ResponseEntity<ConfiguracionApi> actualizarConfiguracionApi(@PathVariable String nombre, @RequestBody ConfiguracionApi configuracionApi) {
+        configuracionApi.setNombre(nombre);
+        Optional<ConfiguracionApi> configuracionActual = configuracionApiService.buscarPorNombre(configuracionApi.getNombre());
 
         ResponseEntity<ConfiguracionApi> response;
 
         if (configuracionActual.isPresent()) {
-            configuracionApi.setId(id);
-            ConfiguracionApi configuracionActualizada = configuracionApiService.actualizarConfiguracionApi(configuracionApi);
+            try {
+                configuracionApi.setId(configuracionActual.get().getId());
+                ConfiguracionApi configuracionActualizada = configuracionApiService.actualizarConfiguracionApi(configuracionApi);
 
-            response = new ResponseEntity<>(configuracionActualizada, HttpStatus.OK);
+                response = new ResponseEntity<>(configuracionActualizada, HttpStatus.OK);
+            }
+            catch (Exception e) {
+                System.out.println("Error al actualizar la configuración: " + e.getMessage());
+                response = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         } else {
             response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -102,16 +115,16 @@ public class ConfiguracionApiController {
 
     // DELETE
 
-    @DeleteMapping("/configuracionApi/{id}")
-    public ResponseEntity<ConfiguracionApi> eliminarConfiguracionApi(@PathVariable Long id) {
-        Optional<ConfiguracionApi> conf = configuracionApiService.buscarPorId(id);
+    @DeleteMapping("/configuracionApi/{nombre}")
+    public ResponseEntity<ConfiguracionApi> eliminarConfiguracionApi(@PathVariable String nombre) {
+        Optional<ConfiguracionApi> conf = configuracionApiService.buscarPorNombre(nombre);
 
         ResponseEntity<ConfiguracionApi> response;
 
         if (conf.isPresent()) {
-            configuracionApiService.eliminarConfiguracionApi(id);
+            configuracionApiService.eliminarConfiguracionApi(conf.get().getId());
 
-            response = new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            response = new ResponseEntity<>(HttpStatus.OK);
         } else {
             response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

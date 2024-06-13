@@ -1,0 +1,46 @@
+<h2 class="text-center">Puertos</h2>
+
+@if (puertos.length === 0) {
+  <div class="alert alert-danger text-center" role="alert">
+    No se han encontrado puertos.
+  </div>
+}
+@else {
+  <ngb-pagination
+    class="d-flex justify-content-center mt-2"
+    [collectionSize]="puertos.length"
+    [pageSize]="pageSize"
+    [(page)]="page"
+    [maxSize]="5"
+    [rotate]="true"
+    [ellipses]="false"
+    [boundaryLinks]="true"
+  />
+
+  <div class="row">
+    @for (puerto of puertos | slice: (page - 1) * pageSize : page * pageSize; track $index) {
+      <div class="card col-lg-4 col-md-6 col-sm-12">
+        <div class="card-body">
+          <h5 class="card-title text-center">Puerto: {{ puerto.numero }}</h5>
+          <p class="card-subtitle mb-2 text-muted">servicio: {{ puerto.servicio }}</p>
+          <p class="card-text">
+            {{ puerto.descripcion.substring(0, 100) }}...
+            <a class="card-link" routerLink="/puerto/{{puerto.numero}}">ver más</a>
+          </p>
+        </div>
+      </div>
+    }
+  </div>
+
+  <ngb-pagination
+    class="d-flex justify-content-center mt-2"
+    [collectionSize]="puertos.length"
+    [pageSize]="pageSize"
+    [(page)]="page"
+    [maxSize]="5"
+    [rotate]="true"
+    [ellipses]="false"
+    [boundaryLinks]="true"
+  />
+}
+

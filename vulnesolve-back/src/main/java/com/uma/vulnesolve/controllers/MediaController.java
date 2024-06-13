@@ -4,9 +4,13 @@ import com.uma.vulnesolve.models.nmap.EscaneoNmap;
 import com.uma.vulnesolve.services.StorageService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.LinkedList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/media")
@@ -19,35 +23,38 @@ public class MediaController {
     }
 
     @PostMapping("upload")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file) {
-        String respuesta = "";
+    public ResponseEntity<Void> handleFileUpload(@RequestParam("file") MultipartFile file) {
 
+        ResponseEntity<Void> responseEntity = null;
         try {
             storageService.guardar(file);
-            respuesta = "Archivo subido";
+            responseEntity = new ResponseEntity<>(HttpStatus.OK);
         }
         catch (Exception e) {
-            respuesta = "Error al subir el archivo. " + e.getMessage();
+            responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return respuesta;
+        return responseEntity;
     }
 
     @GetMapping("/files")
-    public String listUploadedFiles() {
-        StringBuilder respuesta = new StringBuilder();
+    public ResponseEntity<List<String>> listUploadedFiles() {
+        List<String> archivos = new LinkedList<>();
+        ResponseEntity<List<String>> responseEntity = null;
 
         try {
             storageService.cargarTodos().forEach(path -> {
-                respuesta.append(path.getFileName() + "\n");
+                archivos.add(path.getFileName().toString());
             });
+            responseEntity = ResponseEntity.ok(archivos);
         }
         catch (Exception e) {
-            respuesta.append("Error al listar los archivos. ");
-            respuesta.append(e.getMessage());
+            archivos.add("Error al listar los archivos.");
+            archivos.add(e.getMessage());
+            responseEntity = ResponseEntity.badRequest().body(archivos);
         }
 
-        return respuesta.toString();
+        return responseEntity;
     }
 
     @GetMapping("/files/{filename:.+}")
@@ -69,18 +76,18 @@ public class MediaController {
     }
 
     @DeleteMapping("delete/{filename}")
-    public String deleteFile(@PathVariable String filename) {
-        String respuesta = "";
+    public ResponseEntity<Void> deleteFile(@PathVariable String filename) {
 
+        ResponseEntity<Void> responseEntity = null;
         try {
             storageService.borrar(filename);
-            respuesta = "Archivo eliminado";
+            responseEntity = new ResponseEntity<>(HttpStatus.OK);
         }
         catch (Exception e) {
-            respuesta = "Error al eliminar el archivo. " + e.getMessage();
+            responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return respuesta;
+        return responseEntity;
     }
 
     @GetMapping("/escaneo/{filename}")

@@ -10,7 +10,7 @@ import {DatePipe, SlicePipe} from "@angular/common";
 import {VulnerabilidadesService} from "../../services/vulnerabilidades/vulnerabilidades.service";
 import {JsonVulneSolve} from "../../models/vulnerabilidades/json-vulne-solve";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
-import {faArrowUpRightFromSquare} from "@fortawesome/free-solid-svg-icons";
+import {faArrowUp, faArrowUpRightFromSquare, faNetworkWired} from "@fortawesome/free-solid-svg-icons";
 
 @Component({
   selector: 'app-nmap',
@@ -38,7 +38,9 @@ export class NmapComponent {
   vulnerabilidades: JsonVulneSolve;
   pageSize = 1;
   page = 1;
-  protected readonly faArrowUpRightFromSquare = faArrowUpRightFromSquare;
+  enlace = faArrowUpRightFromSquare;
+  subir = faArrowUp;
+  topologia = faNetworkWired;
 
   constructor(
     private escanearService: EscanearService,
@@ -60,9 +62,9 @@ export class NmapComponent {
   }
 
   buscarEscaneos() : void {
-    this.escanearService.escaneos()
+    this.escanearService.verEscaneosEjempo()
       .subscribe(escaneos => {
-        this.escaneos = escaneos.trim().split("\n");
+        this.escaneos = escaneos;
       });
   }
 
@@ -99,7 +101,7 @@ export class NmapComponent {
   }
 
   escaneoEstatico(escaneo:string){
-    this.escanearService.escaneo(escaneo)
+    this.escanearService.escanearEjemplo(escaneo)
       .subscribe(escaneo => {
         this.escaneo = escaneo;
         this.cargarGrafo();
@@ -136,7 +138,7 @@ export class NmapComponent {
     let encontrado : boolean = false;
     let llamo: number = Date.now();
     let recivo : number = 0;
-    this.vulnerabilidadesService.vulnerabilidades(servicio)
+    this.vulnerabilidadesService.vulnerabilidadesMultiples(servicio)
       .subscribe(vulnerabilidades => {
         encontrado = true;
         for (let equipo of this.escaneo.equipos) {
@@ -310,6 +312,11 @@ export class NmapComponent {
       .style('cursor', 'pointer')
       .style('text-shadow', '0px 0px 2px white')
       .on('click', (event: any, d: any) => {
+        // desplazar a div cuyo id es equipo-id
+        let div = document.getElementById('equipo-' + d.id);
+        if (div !== null) {
+          div.scrollIntoView({behavior: 'smooth'});
+        }
       });
 
     mac = svg
@@ -377,6 +384,22 @@ export class NmapComponent {
         .attr('x', (d: any) => d.x + ancho/2)
         .attr('y', (d: any) => d.y + 4*letra + letra);
     });
+
+    // agregar un boton para descargar figura en formato svg
+    d3.select('button#descargar')
+      .on('click', () => {
+        const svg : SVGSVGElement = d3.select('figure').select('svg').node() as SVGSVGElement;
+        const xml = new XMLSerializer().serializeToString(svg);
+        const blob = new Blob([xml], {type: 'image/svg+xml;charset=utf-8'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'grafo.svg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      });
+
   }
 
   forceContain(width: number, height: number, ancho: number, alto: number) {
@@ -387,6 +410,17 @@ export class NmapComponent {
       d.x = Math.max(0, Math.min(width - ancho, d.x));
 
       d.y = Math.max(0, Math.min(height - alto, d.y));
+    }
+  }
+
+  scrollToTop() {
+    // que se desplace suavemente hacia la etiqueta figure#topologia o al inicio de la pagina.
+    let div = document.getElementById('topologia');
+    if (div !== null) {
+      div.scrollIntoView({behavior: 'smooth'});
+    }
+    else {
+      window.scrollTo({top: 0, behavior: 'smooth'});
     }
   }
 }

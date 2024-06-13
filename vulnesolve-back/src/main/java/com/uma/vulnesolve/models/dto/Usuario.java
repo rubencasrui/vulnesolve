@@ -1,5 +1,6 @@
 package com.uma.vulnesolve.models.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,17 +12,18 @@ public class Usuario {
     @Column(length = 16, unique = true)
     private String usuario;
     @Column(length = 64)
-    private String pass;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String clave;
     private boolean esAdmin;
 
     public Usuario() {
 
     }
 
-    public Usuario(Long id, String usuario, String pass, boolean esAdmin) {
+    public Usuario(Long id, String usuario, String clave, boolean esAdmin) {
         this.id = id;
         this.usuario = usuario;
-        this.pass = pass;
+        this.clave = clave;
         this.esAdmin = esAdmin;
     }
 
@@ -41,12 +43,12 @@ public class Usuario {
         this.usuario = usuario;
     }
 
-    public String getPass() {
-        return pass;
+    public String getClave() {
+        return clave;
     }
 
-    public void setPass(String pass) {
-        this.pass = pass;
+    public void setClave(String pass) {
+        this.clave = pass;
     }
 
     public boolean getEsAdmin() {

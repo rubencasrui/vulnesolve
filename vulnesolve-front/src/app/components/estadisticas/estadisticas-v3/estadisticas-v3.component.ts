@@ -17,7 +17,6 @@ export class EstadisticasV3Component {
   private margin =  50;
   private width  = 500;
   private height = 500;
-  // The radius of the pie chart is half the smallest side
   private radius = Math.min(this.width, this.height) / 2 - this.margin;
   private colors : any;
 
@@ -41,8 +40,7 @@ export class EstadisticasV3Component {
       .subscribe(res => {
           this.severidadesV3 = res;
           this.cargarEstadisticasV3();
-        }
-      )
+      })
       .add(() => {
         recivo = Date.now();
         console.log("V3: "+(recivo-llamo)/1000+" segundos");
@@ -77,6 +75,52 @@ export class EstadisticasV3Component {
       .style("font-size", "16px")
       .style("font-weight", "bold")
       .text("Vulnerabilidades con Severidad 3.x");
+
+    // Añadir el total
+    d3.select("figure#pie3 svg")
+      .append("text")
+      .attr("x", this.width / 2)
+      .attr("y", this.height - this.margin/8)
+      .attr("text-anchor", "middle")
+      .style("font-size", "16px")
+      .text("Vulnerabilidades en total: "+this.severidadesV3.reduce((a, b) => a + b.cantidad, 0));
+
+    // Añadir la leyenda
+    d3.select("figure#pie3 svg")
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 20)
+      .attr("fill", "#ffdb4d")
+      .style("font-weight", "bold")
+      .style("font-size", "20px")
+      .text("· " + (this.severidadesV3[0].cantidad/this.severidadesV3.reduce((a, b) => a + b.cantidad, 0)*100).toFixed(0) + "% BAJA");
+
+    d3.select("figure#pie3 svg")
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 20*2)
+      .attr("fill", "#ffaa00")
+      .style("font-weight", "bold")
+      .style("font-size", "20px")
+      .text("· " + (this.severidadesV3[1].cantidad/this.severidadesV3.reduce((a, b) => a + b.cantidad, 0)*100).toFixed(0) + "% MEDIA");
+
+    d3.select("figure#pie3 svg")
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 20*3)
+      .attr("fill", "#ff5f5f")
+      .style("font-weight", "bold")
+      .style("font-size", "20px")
+      .text("· " + (this.severidadesV3[2].cantidad/this.severidadesV3.reduce((a, b) => a + b.cantidad, 0)*100).toFixed(0) + "% ALTA");
+
+    d3.select("figure#pie3 svg")
+      .append("text")
+      .attr("x", 0)
+      .attr("y", 20*4)
+      .attr("fill", "#b366ff")
+      .style("font-weight", "bold")
+      .style("font-size", "20px")
+      .text("· " + (this.severidadesV3[3].cantidad/this.severidadesV3.reduce((a, b) => a + b.cantidad, 0)*100).toFixed(0) + "% CRÍTICA");
   }
 
   private createColors(): void {
@@ -101,11 +145,11 @@ export class EstadisticasV3Component {
       )
       .attr('fill', (d: any, i: any) => (this.colors(i)))
       .attr("stroke", "#121926")
-      .style("stroke-width", "1px");
+      .style("stroke-width", "0.25px");
 
     // Add labels
     const labelLocation = d3.arc()
-      .innerRadius(100)
+      .innerRadius(this.radius/4)
       .outerRadius(this.radius);
 
     this.svg
@@ -113,10 +157,9 @@ export class EstadisticasV3Component {
       .data(pie(this.severidadesV3))
       .enter()
       .append('text')
-      .text((d: any)=> d.data.indice + ": " + d.data.cantidad)
+      .text((d: any)=> "←" + d.data.cantidad)
       .attr("transform", (d: any) => "translate(" + labelLocation.centroid(d) + ")")
-      .style("text-anchor", "middle")
-      .style("font-size", 15);
+      .style("font-weight", "bold");
 
   }
 }

@@ -6,11 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface PuertoRepository extends JpaRepository<Puerto, Long> {
+public interface PuertoRepository extends JpaRepository<Puerto, Integer> {
 
-    @Query("SELECT p FROM Puerto p WHERE p.numero = ?1")
-    List<Puerto> buscarPorNumero(int numero);
-
-    @Query("SELECT p FROM Puerto p WHERE p.nombre LIKE %?1%")
-    List<Puerto> buscarPorNombre(String nombre);
+    @Query("SELECT p FROM Puerto p WHERE p.servicio LIKE %?1%")
+    List<Puerto> findByServicio(String servicio);
 }
