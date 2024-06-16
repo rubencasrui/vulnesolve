@@ -19,7 +19,7 @@ import {RouterLink} from "@angular/router";
 export class PuertosComponent {
 
   puertos : Puerto[];
-  page = 5;
+  page = 1;
   pageSize = 6;
 
   constructor(
