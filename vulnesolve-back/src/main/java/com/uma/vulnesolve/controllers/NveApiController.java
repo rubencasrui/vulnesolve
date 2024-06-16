@@ -21,11 +21,6 @@ public class NveApiController {
         this.nveApiService = nveApiService;
     }
 
-    @RequestMapping("/hola")
-    public String hola() {
-        return "Hola";
-    }
-
     @RequestMapping("/vulnerabilities/{keywordSearch}")
     public JsonNve getVulnerabilities(@PathVariable String keywordSearch) {
         return nveApiService.getVulnerabilities(keywordSearch);

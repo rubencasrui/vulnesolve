@@ -26,7 +26,21 @@
         </div>
       </ng-form>
 
-      <a class="nav-link link-danger" routerLink="administracion">admin</a>
+      <!-- Si sesion no iniciada -->
+      @if (usuariosService.sesionIniciada){
+        <!-- Si usuario administrador -->
+        @if(usuariosService.esUsuarioAdministrador){
+          <a class="nav-link link-warning" routerLink="administracion">admin</a>
+        }
+
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-link link-danger" (click)="cerrarSesion()">cerrar sesion</button>
+        </div>
+      } @else {
+        <a class="nav-link" routerLink="iniciar-sesion">iniciar sesion</a>
+
+        <a class="nav-link link-success" routerLink="registrar">registrar</a>
+      }
 
     </div>
   </div>

@@ -36,6 +36,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         this.autenticationManager = autenticationManager;
     }
 
+    // Obtener valores usuario y clave del cuerpo de la petición y probar a autenticar
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
         Usuario user = null;
@@ -60,6 +61,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         return autenticationManager.authenticate(authenticationToken);
     }
 
+    // Generar token JWT si la autenticación es exitosa, sino devolver mensaje de error
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
 
@@ -75,7 +77,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String token = Jwts.builder()
            .subject(usuario)
            .claims(claims)
-           .expiration(new Date(System.currentTimeMillis() + 1*60*60*1000))
+           .expiration(new Date(System.currentTimeMillis() + TIEMPO_EXPIRACION))
            .issuedAt(new Date())
            .signWith(SECRET_KEY)
            .compact();
@@ -83,8 +85,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
 
         Map<String, String> body = new HashMap<>();
-        body.put("token", token);
         body.put("usuario", usuario);
+        body.put("rol", roles.toString());
+        body.put("token", token);
         body.put("mensaje", "Autenticación exitosa");
 
         response.getWriter().write(new ObjectMapper().writeValueAsString(body));

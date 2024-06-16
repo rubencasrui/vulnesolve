@@ -120,6 +120,33 @@
     </div>
   </div>
 
+  <div class="col-md-6 col-xs-12 mb-2">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="text-center">Usuarios</h2>
+
+        <div class="d-flex  justify-content-center mb-2">
+          <label for="usuario">Usuarios no administradores: </label>
+          <select id="usuario" class="custom-select" [(ngModel)]="usuario">
+            @if (usuarios.length === 0) {
+              <option value="" disabled>Sin resultados</option>
+            }
+            @for (user of usuarios; track $index) {
+              <option value="{{user.usuario}}" >{{user.usuario}}</option>
+            }
+          </select>
+        </div>
+
+        <div class="d-flex  justify-content-center mb-2">
+          <button class="btn btn-warning" (click)="abrirModalHacerAdministrador(modalHacerAdministrador)" [disabled]="!usuario">Hacer admin a {{usuario}}</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+
 </div>
 
 <ng-template #modalEliminarEscaneoEjemplo let-modalEscaneoEjemplo>
@@ -161,6 +188,20 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="modalConfiguracion.close('Close click')">Cancelar</button>
     <button type="button" class="btn btn-danger" (click)="eliminarConfiguracion();modalConfiguracion.close('Close click')">Eliminar</button>
+  </div>
+</ng-template>
+
+<ng-template #modalHacerAdministrador let-modalHacerAdministrador>
+  <div class="modal-header">
+    <h4 class="modal-title">Hacer administrador usuario {{usuario}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modalHacerAdministrador.close('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <p>¿Está seguro de que desea hacer administrador a {{usuario}}?</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modalHacerAdministrador.close('Close click')">Cancelar</button>
+    <button type="button" class="btn btn-warning" (click)="hacerAdministrador();modalHacerAdministrador.close('Close click')">Hacer administrador</button>
   </div>
 </ng-template>
 

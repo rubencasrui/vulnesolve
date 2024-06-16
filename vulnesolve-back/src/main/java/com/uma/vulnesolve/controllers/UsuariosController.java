@@ -39,6 +39,24 @@ public class UsuariosController {
         return response;
     }
 
+    @PostMapping("/registrar")
+    public ResponseEntity<Usuario> registrarUsuario(@RequestBody Usuario usuario) {
+        Optional<Usuario> usuarioEntregado = usuarioService.buscarPorNombre(usuario.getUsuario());
+
+        ResponseEntity<Usuario> response;
+
+        if(usuarioEntregado.isPresent()) {
+            response = new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        else{
+            usuario.setEsAdmin(false);
+            Usuario usuarioCreado = usuarioService.crearUsuario(usuario);
+            response = new ResponseEntity<>(usuarioCreado, HttpStatus.CREATED);
+        }
+
+        return response;
+    }
+
     // READ
 
     @GetMapping("/usuarios")
@@ -59,7 +77,7 @@ public class UsuariosController {
         return response;
     }
 
-    @GetMapping("/usuarios/noadmin")
+    @GetMapping("/usuarios/no-admin")
     public ResponseEntity<List<Usuario>> usuariosNoAdmin() {
         List<Usuario> usuarios = usuarioService.usuariosNoAdmin();
 
@@ -102,15 +120,41 @@ public class UsuariosController {
 
     // UPDATE
 
+    @PutMapping("/usuario/hacer-admin/{nombre}")
+    public ResponseEntity<Usuario> hacerAdmin(@PathVariable String nombre, @RequestBody Usuario usuario) {
+        Optional<Usuario> usuarioSolicitado = usuarioService.buscarPorNombre(nombre);
+
+        ResponseEntity<Usuario> response;
+
+        if (usuarioSolicitado.isPresent()) {
+            Usuario usuarioActualizado = usuarioService.hacerAdmin(usuarioSolicitado.get());
+            response = new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
+        }
+        else {
+            response = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return response;
+    }
+
     // DELETE
 
     // EXTRA
 
-    @GetMapping("/usuario/tokenExpirado/{token}")
+    @GetMapping("/usuario/token-expirado/{token}")
     public ResponseEntity<Map<String, Boolean>> tokenExpirado(@PathVariable String token) {
         boolean estaExpirado = usuarioService.tokenExpirado(token);
 
         ResponseEntity<Map<String, Boolean>> response = new ResponseEntity<>(Map.of("expirado", estaExpirado), HttpStatus.OK);
+
+        return response;
+    }
+
+    @GetMapping("/usuario/es-administrador/{token}")
+    public ResponseEntity<Map<String, Boolean>> esAdministrador(@PathVariable String token) {
+        boolean esAdmin = usuarioService.esUsuarioAdmin(token);
+
+        ResponseEntity<Map<String, Boolean>> response = new ResponseEntity<>(Map.of("esAdmin", esAdmin), HttpStatus.OK);
 
         return response;
     }

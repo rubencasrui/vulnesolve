@@ -57,6 +57,15 @@ public class UsuarioService {
 
     // UPDATE
 
+    public Usuario actualizarUsuario(Usuario usuario){
+        return usuarioRepository.save(usuario);
+    }
+
+    public Usuario hacerAdmin(Usuario usuario){
+        usuario.setEsAdmin(true);
+        return usuarioRepository.save(usuario);
+    }
+
     // DELETE
 
     // EXTRA
@@ -66,12 +75,37 @@ public class UsuarioService {
 
         try {
             Claims claims = Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
+
+            // Si la fecha de expiración es anterior a la fecha actual, el token está expirado
+            // Sino no está expirado
             estaExpirado = claims.getExpiration().before(new Date());
         }
         catch (JwtException e) {
+            // Si hay un error en la validación del token, se considera expirado
             estaExpirado = true;
         }
 
         return estaExpirado;
+    }
+
+    public boolean esUsuarioAdmin (String token) {
+        boolean esAdmin = false;
+
+        try {
+            Claims claims = Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
+            String usuario = claims.getSubject();
+
+            Optional<Usuario> usuarioOptional = usuarioRepository.buscarPorNombre(usuario);
+
+            if (usuarioOptional.isPresent()) {
+                Usuario usuarioEncontrado = usuarioOptional.get();
+                esAdmin = usuarioEncontrado.getEsAdmin();
+            }
+        }
+        catch (JwtException e) {
+            esAdmin = false;
+        }
+
+        return esAdmin;
     }
 }

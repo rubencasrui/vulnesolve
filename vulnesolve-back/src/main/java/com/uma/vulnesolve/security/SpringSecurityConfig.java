@@ -42,8 +42,7 @@ public class SpringSecurityConfig {
                     new JwtValidationFilter(getAuthenticationManager())
             )
             .csrf(
-                config -> config
-                    .disable()
+                config -> config.disable()
             )
             .sessionManagement(management -> management
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

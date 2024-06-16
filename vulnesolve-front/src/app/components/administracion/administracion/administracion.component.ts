@@ -7,6 +7,8 @@ import {NgbModal, NgbToast} from "@ng-bootstrap/ng-bootstrap";
 import {ConfiguracionApi} from "../../../models/dto/configuracion-api";
 import {ConfiguracionApiService} from "../../../services/baseDatos/configuracion-api.service";
 import {EscanearService} from "../../../services/escanear/escanear.service";
+import {UsuariosService} from "../../../services/usuarios/usuarios.service";
+import {Usuario} from "../../../models/usuario/usuario";
 
 @Component({
   selector: 'app-administracion',
@@ -31,6 +33,9 @@ export class AdministracionComponent {
   escaneosEjemplo : string[];
   formData : FormData;
 
+  usuario: string | undefined;
+  usuarios: Usuario[];
+
   show: boolean;
   mensaje: string;
 
@@ -38,11 +43,13 @@ export class AdministracionComponent {
     private puertosService: PuertosService,
     private configuracionApiService: ConfiguracionApiService,
     private escanearService: EscanearService,
+    private usuariosService: UsuariosService,
     private modalService: NgbModal
   ) {
     this.puertos = [];
     this.configuraciones = [];
     this.escaneosEjemplo = [];
+    this.usuarios = [];
     this.formData = new FormData();
 
     this.show = false;
@@ -53,6 +60,7 @@ export class AdministracionComponent {
     this.obtenerPuertos();
     this.obtenerConfiguraciones();
     this.obtenerEscaneosEjemplo();
+    this.obtenerUsuariosNoAdmin();
   }
 
   obtenerPuertos(): void {
@@ -236,5 +244,53 @@ export class AdministracionComponent {
   abrirModalEliminarEscaneoEjemplo(content: any) {
     this.modalService.open(content, { centered: true });
   }
+
+  /********************************************************************************************************************/
+
+  obtenerUsuariosNoAdmin() {
+    this.usuariosService.obtenerUsuariosNoAdmin()
+      .subscribe(usuarios => {
+        this.usuarios = usuarios;
+        if (this.usuarios.length > 0) {
+          this.usuario = this.usuarios[0].usuario;
+        }
+      });
+  }
+
+  hacerAdministrador() {
+    if (this.usuario){
+      this.usuariosService.hacerAdministrador(new Usuario(0, this.usuario, false))
+        .subscribe({
+          next: () => {
+            this.obtenerUsuariosNoAdmin();
+            this.usuario = undefined;
+
+            this.show = true;
+            this.mensaje = "Usuario hecho administrador con éxito";
+          },
+          error: (error) => {
+            console.log(error);
+            if (error.status == 404) {
+              this.show = true;
+              this.mensaje = "Usuario no encontrado";
+            }
+            else {
+              this.show = true;
+              this.mensaje = "Error al hacer administrador al usuario";
+            }
+          }
+        });
+    }
+    else {
+      this.show = true;
+      this.mensaje = "Error al seleccionar el usuario a hacer administrador";
+    }
+  }
+
+  abrirModalHacerAdministrador(content: any) {
+    this.modalService.open(content, { centered: true });
+  }
+
+  /********************************************************************************************************************/
 
 }
