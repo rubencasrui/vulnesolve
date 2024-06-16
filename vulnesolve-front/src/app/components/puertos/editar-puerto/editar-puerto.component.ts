@@ -22,6 +22,7 @@ export class EditarPuertoComponent {
   numero !: number;
   puerto : Puerto;
   encontrado: boolean;
+  buscando: boolean;
   show: boolean;
   mensaje: string;
 
@@ -30,6 +31,7 @@ export class EditarPuertoComponent {
   ) {
     this.puerto = new Puerto(0, "", "");
     this.encontrado = false;
+    this.buscando = true;
     this.show = false;
     this.mensaje = "";
   }
@@ -40,9 +42,13 @@ export class EditarPuertoComponent {
         next: (puerto : Puerto) => {
           this.encontrado = true;
           this.puerto = puerto
+
+          this.buscando = false;
         },
         error: (error : HttpErrorResponse) => {
           this.encontrado = false;
+
+          this.buscando = false;
         }
       });
   }

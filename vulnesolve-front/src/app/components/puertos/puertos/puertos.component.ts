@@ -19,17 +19,22 @@ import {RouterLink} from "@angular/router";
 export class PuertosComponent {
 
   puertos : Puerto[];
-  page = 1;
-  pageSize = 6;
+  page : number;
+  pageSize : number;
+  cargado : boolean;
 
   constructor(
     private puertosService: PuertosService
   ) {
     this.puertos = [];
+    this.page = 1;
+    this.pageSize = 6;
+    this.cargado = false;
   }
 
   ngOnInit(): void {
     this.puertosService.obtenerPuertos().subscribe(puertos => {
+        this.cargado = true;
         this.puertos = puertos;
       });
   }

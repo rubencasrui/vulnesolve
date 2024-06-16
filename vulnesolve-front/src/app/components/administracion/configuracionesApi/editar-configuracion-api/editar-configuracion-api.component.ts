@@ -22,6 +22,7 @@ export class EditarConfiguracionApiComponent {
   nombre !: string;
   configuracion !: ConfiguracionApi;
   encontrado : boolean;
+  buscando: boolean;
 
   show: boolean;
   mensaje: string;
@@ -30,6 +31,7 @@ export class EditarConfiguracionApiComponent {
     private configuracionApiService: ConfiguracionApiService
   ) {
     this.encontrado = false;
+    this.buscando = true;
 
     this.show = false;
     this.mensaje = "";
@@ -44,9 +46,13 @@ export class EditarConfiguracionApiComponent {
         next: (configuracion : ConfiguracionApi) => {
           this.encontrado = true;
           this.configuracion = configuracion
+
+          this.buscando = false;
         },
         error: (error : HttpErrorResponse) => {
           this.encontrado = false;
+
+          this.buscando = false;
         }
       });
   }

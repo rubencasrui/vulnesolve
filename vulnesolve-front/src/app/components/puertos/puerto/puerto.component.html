@@ -1,18 +1,33 @@
 <h2 class="text-center">Puerto: {{numero}}</h2>
 
-@if (encontrado){
+@if(buscando){
   <div class="row">
     <div class="card mb-2">
       <div class="card-body">
-        <p class="card-subtitle mb-2 text-muted">servicio: {{ puerto.servicio }}</p>
-        <p class="card-text">{{ puerto.descripcion }}</p>
-        <a class="card-link" routerLink="/vulnerabilidades/{{puerto.servicio}}">ver vulnerabilidades</a>
+        <p class="card-subtitle mb-2 text-muted">
+          servicio:
+          <span class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </span>
+        </p>
       </div>
     </div>
   </div>
-}
-@else {
-  <div class="alert alert-danger text-center" role="alert">
-    No se ha encontrado un puerto con este número.
-  </div>
+} @else {
+  @if (encontrado){
+    <div class="row">
+      <div class="card mb-2">
+        <div class="card-body">
+          <p class="card-subtitle mb-2 text-muted">servicio: {{ puerto.servicio }}</p>
+          <p class="card-text">{{ puerto.descripcion }}</p>
+          <a class="card-link" routerLink="/vulnerabilidades/{{puerto.servicio}}">ver vulnerabilidades</a>
+        </div>
+      </div>
+    </div>
+  }
+  @else {
+    <div class="alert alert-danger text-center" role="alert">
+      No se ha encontrado un puerto con este número.
+    </div>
+  }
 }

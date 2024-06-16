@@ -20,11 +20,13 @@ export class ConfiguracionApiComponent {
   nombre !: string;
   configuracion !: ConfiguracionApi;
   encontrado : boolean;
+  buscando : boolean;
 
   constructor(
     private configuracionApiService: ConfiguracionApiService
   ) {
     this.encontrado = false;
+    this.buscando = true;
   }
 
   ngOnInit(): void {
@@ -36,9 +38,13 @@ export class ConfiguracionApiComponent {
         next: (configuracion : ConfiguracionApi) => {
           this.encontrado = true;
           this.configuracion = configuracion
+
+          this.buscando = false;
         },
         error: (error : HttpErrorResponse) => {
           this.encontrado = false;
+
+          this.buscando = false;
         }
       });
   }

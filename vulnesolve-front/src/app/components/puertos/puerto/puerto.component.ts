@@ -22,11 +22,13 @@ export class PuertoComponent {
   @Input("numero") numero !: number;
   puerto !: Puerto;
   encontrado : boolean;
+  buscando : boolean;
 
   constructor(
     private puertosService: PuertosService
   ) {
     this.encontrado = false;
+    this.buscando = true;
   }
 
   ngOnInit(): void {
@@ -38,9 +40,11 @@ export class PuertoComponent {
         next: (puerto : Puerto) => {
           this.encontrado = true;
           this.puerto = puerto
+          this.buscando = false;
         },
         error: (error : HttpErrorResponse) => {
           this.encontrado = false;
+          this.buscando = false;
         }
       });
   }

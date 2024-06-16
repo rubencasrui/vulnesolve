@@ -1,45 +1,50 @@
-@if (encontrado){
-  <div class="card mx-auto mt-2 mb-2 col-md-12 col-lg-8">
-    <div class="card-body">
-      <h1 class="text-center">Modificar Configuración de Api: {{configuracion.nombre}}</h1>
-      <form (ngSubmit)="modificarConfiguracion()" #modificarConfiguracionForm="ngForm">
-        <div class="form-group">
-          <label for="cantidadResultados">Cantidad de resultados: (1-2000)</label>
-          <input type="number" class="form-control" id="cantidadResultados" name="cantidadResultados" min="1" max="2000" required [(ngModel)]="configuracion.cantidadResultados">
-        </div>
-        <div class="form-group">
-          <label for="modoBusqueda" class="m-2">Modo de búsqueda: </label>
-          <select class="custom-select" name="modoBusqueda" id="modoBusqueda" [(ngModel)]="configuracion.modoBusqueda" required>
-            <option value="1" selected>
-              1: Resultados más antiguos.  Velocidad: rápida
-            </option>
-            <option value="2">
-              2: Resultados más recientes. Velocidad: moderada
-            </option>
-            <option value="3">
-              3: Todos los resultados.     Velocidad: lenta
-            </option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="m-2" for="soloCriticos">Solo críticos: </label>
-          <input type="checkbox" name="soloCriticos" id="soloCriticos" [(ngModel)]="configuracion.soloCriticos">
-        </div>
-        <div class="form-group">
-          <label for="incrementoIndice">Incremento de índice: (0-50)</label>
-          <input type="number" class="form-control" id="incrementoIndice" name="incrementoIndice" min="0" max="50" required [(ngModel)]="configuracion.incrementoIndice">
-        </div>
-        <button type="submit" class="btn btn-primary mt-2" [disabled]="!modificarConfiguracionForm.valid">Modificar Configuración</button>
-      </form>
+@if(buscando){
+  <div class="alert alert-info text-center" role="alert">
+    Cargando configuración...
+  </div>
+} @else {
+  @if (encontrado){
+    <div class="card mx-auto mt-2 mb-2 col-md-12 col-lg-8">
+      <div class="card-body">
+        <h1 class="text-center">Modificar Configuración de Api: {{configuracion.nombre}}</h1>
+        <form (ngSubmit)="modificarConfiguracion()" #modificarConfiguracionForm="ngForm">
+          <div class="form-group">
+            <label for="cantidadResultados">Cantidad de resultados: (1-2000)</label>
+            <input type="number" class="form-control" id="cantidadResultados" name="cantidadResultados" min="1" max="2000" required [(ngModel)]="configuracion.cantidadResultados">
+          </div>
+          <div class="form-group">
+            <label for="modoBusqueda" class="m-2">Modo de búsqueda: </label>
+            <select class="custom-select" name="modoBusqueda" id="modoBusqueda" [(ngModel)]="configuracion.modoBusqueda" required>
+              <option value="1" selected>
+                1: Resultados más antiguos.  Velocidad: rápida
+              </option>
+              <option value="2">
+                2: Resultados más recientes. Velocidad: moderada
+              </option>
+              <option value="3">
+                3: Todos los resultados.     Velocidad: lenta
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="m-2" for="soloCriticos">Solo críticos: </label>
+            <input type="checkbox" name="soloCriticos" id="soloCriticos" [(ngModel)]="configuracion.soloCriticos">
+          </div>
+          <div class="form-group">
+            <label for="incrementoIndice">Incremento de índice: (0-50)</label>
+            <input type="number" class="form-control" id="incrementoIndice" name="incrementoIndice" min="0" max="50" required [(ngModel)]="configuracion.incrementoIndice">
+          </div>
+          <button type="submit" class="btn btn-primary mt-2" [disabled]="!modificarConfiguracionForm.valid">Modificar Configuración</button>
+        </form>
+      </div>
     </div>
-  </div>
+  }
+  @else {
+    <div class="alert alert-danger text-center" role="alert">
+      No se ha encontrado una configuración con este nombre.
+    </div>
+  }
 }
-@else {
-  <div class="alert alert-danger text-center" role="alert">
-    No se ha encontrado una configuración con este nombre.
-  </div>
-}
-
 
 @if (show) {
   <ngb-toast header="Mensaje" [autohide]="false" (hidden)="show = false" class="position-fixed bottom-0 end-0 m-2">

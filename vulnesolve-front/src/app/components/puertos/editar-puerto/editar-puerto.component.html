@@ -1,26 +1,33 @@
-@if (encontrado){
-  <div class="card mx-auto mt-2 mb-2 col-md-12 col-lg-8">
-    <div class="card-body">
-      <h1>Editar Puerto {{puerto.numero}}</h1>
-      <form (ngSubmit)="editarPuerto()" #editarPuertoForm="ngForm">
-        <div class="form-group">
-          <label for="servicio">Servicio</label>
-          <input type="text" class="form-control" id="servicio" name="servicio" minlength="1" maxlength="16" required [(ngModel)]="puerto.servicio">
-        </div>
-        <div class="form-group">
-          <label for="descripcion">descripcion</label>
-          <textarea class="form-control" id="descripcion" name="descipcion" maxlength="1024" style="height: 300px" [(ngModel)]="puerto.descripcion">
-        </textarea>
-        </div>
-        <button type="submit" class="btn btn-primary mt-2" [disabled]="!editarPuertoForm.valid">Editar Puerto</button>
-      </form>
-    </div>
+@if(buscando){
+  <div class="alert alert-info text-center" role="alert">
+    Buscando puerto {{numero}}...
   </div>
 }
-@else {
-  <div class="alert alert-danger text-center" role="alert">
-    No se ha encontrado el puerto {{numero}}
-  </div>
+@else{
+  @if (encontrado){
+    <div class="card mx-auto mt-2 mb-2 col-md-12 col-lg-8">
+      <div class="card-body">
+        <h1>Editar Puerto {{puerto.numero}}</h1>
+        <form (ngSubmit)="editarPuerto()" #editarPuertoForm="ngForm">
+          <div class="form-group">
+            <label for="servicio">Servicio</label>
+            <input type="text" class="form-control" id="servicio" name="servicio" minlength="1" maxlength="16" required [(ngModel)]="puerto.servicio">
+          </div>
+          <div class="form-group">
+            <label for="descripcion">descripcion</label>
+            <textarea class="form-control" id="descripcion" name="descipcion" maxlength="1024" style="height: 300px" [(ngModel)]="puerto.descripcion">
+          </textarea>
+          </div>
+          <button type="submit" class="btn btn-primary mt-2" [disabled]="!editarPuertoForm.valid">Editar Puerto</button>
+        </form>
+      </div>
+    </div>
+  }
+  @else {
+    <div class="alert alert-danger text-center" role="alert">
+      No se ha encontrado el puerto {{numero}}
+    </div>
+  }
 }
 
 @if (show) {

@@ -40,13 +40,17 @@ export class UsuariosService {
                     this.esUsuarioAdministrador = respuesta.esAdmin;
                   },
                   error: (error) => {
-                    console.log(error);
+                    console.log("Error esUsuarioAdministrador", error);
+                    this.esUsuarioAdministrador = false;
                   }
                 });
             }
           },
           error: (error) => {
-            console.log(error);
+            console.log("Error token expirado: ", error);
+            localStorage.removeItem('token');
+            this.sesionIniciada = false;
+            this.esUsuarioAdministrador = false;
           }
         });
     }
