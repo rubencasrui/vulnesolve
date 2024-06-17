@@ -37,7 +37,7 @@
     @if (escaneo.equipos.length > 0){
       <div class="row align-items-center mb-2">
         <div class="col text-center">
-          <button id="descargar" class="btn btn-primary">Descargar topología</button>
+          <button class="btn btn-primary" (click)="descargarSVG()">Descargar topología <fa-icon [icon]="descargar"></fa-icon></button>
         </div>
       </div>
       <h2 class="text-center mb-4">Equipos:</h2>

@@ -10,7 +10,7 @@ import {DatePipe, SlicePipe} from "@angular/common";
 import {VulnerabilidadesService} from "../../services/vulnerabilidades/vulnerabilidades.service";
 import {JsonVulneSolve} from "../../models/vulnerabilidades/json-vulne-solve";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
-import {faArrowUp, faArrowUpRightFromSquare, faNetworkWired, faCircleInfo} from "@fortawesome/free-solid-svg-icons";
+import {faArrowUp, faArrowUpRightFromSquare, faNetworkWired, faCircleInfo, faDownload} from "@fortawesome/free-solid-svg-icons";
 import {PuertosService} from "../../services/baseDatos/puertos.service";
 import {Puerto} from "../../models/dto/puerto";
 import {RouterLink} from "@angular/router";
@@ -48,6 +48,7 @@ export class NmapComponent {
   subir = faArrowUp;
   topologia = faNetworkWired;
   info = faCircleInfo;
+  descargar = faDownload;
 
   constructor(
     private escanearService: EscanearService,
@@ -431,21 +432,22 @@ export class NmapComponent {
         .attr('y', (d: any) => d.y + 4*letra + letra);
     });
 
-    // agregar un boton para descargar figura en formato svg
-    d3.select('button#descargar')
-      .on('click', () => {
-        const svg : SVGSVGElement = d3.select('figure').select('svg').node() as SVGSVGElement;
-        const xml = new XMLSerializer().serializeToString(svg);
-        const blob = new Blob([xml], {type: 'image/svg+xml;charset=utf-8'});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'grafo.svg';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      });
+  }
 
+  descargarSVG() {
+    const svg : SVGSVGElement = d3.select('figure').select('svg').node() as SVGSVGElement;
+    const xml = new XMLSerializer().serializeToString(svg);
+    const blob = new Blob([xml], {type: 'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const fecha = new Date();
+    const fechaTexto = fecha.getFullYear() + '-' + (fecha.getMonth() + 1) + '-' + fecha.getDate() + '_' + fecha.getHours() + '-' + fecha.getMinutes() + '-' + fecha.getSeconds();
+
+    a.href = url;
+    a.download = 'grafo_'+fechaTexto+'.svg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   forceContain(width: number, height: number, ancho: number, alto: number) {
