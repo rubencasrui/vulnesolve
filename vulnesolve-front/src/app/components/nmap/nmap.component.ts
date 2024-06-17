@@ -10,7 +10,10 @@ import {DatePipe, SlicePipe} from "@angular/common";
 import {VulnerabilidadesService} from "../../services/vulnerabilidades/vulnerabilidades.service";
 import {JsonVulneSolve} from "../../models/vulnerabilidades/json-vulne-solve";
 import {FontAwesomeModule} from "@fortawesome/angular-fontawesome";
-import {faArrowUp, faArrowUpRightFromSquare, faNetworkWired} from "@fortawesome/free-solid-svg-icons";
+import {faArrowUp, faArrowUpRightFromSquare, faNetworkWired, faCircleInfo} from "@fortawesome/free-solid-svg-icons";
+import {PuertosService} from "../../services/baseDatos/puertos.service";
+import {Puerto} from "../../models/dto/puerto";
+import {RouterLink} from "@angular/router";
 
 @Component({
   selector: 'app-nmap',
@@ -22,7 +25,8 @@ import {faArrowUp, faArrowUpRightFromSquare, faNetworkWired} from "@fortawesome/
     SlicePipe,
     NgbRating,
     FontAwesomeModule,
-    DatePipe
+    DatePipe,
+    RouterLink
   ],
   templateUrl: './nmap.component.html',
   styleUrl: './nmap.component.css'
@@ -36,16 +40,20 @@ export class NmapComponent {
   escaneo : EscaneoNmap;
   escaneos : string[];
   vulnerabilidades: JsonVulneSolve;
+  listaPuertos : Puerto[];
+  puertoDelModal : Puerto;
   pageSize = 1;
   page = 1;
   enlace = faArrowUpRightFromSquare;
   subir = faArrowUp;
   topologia = faNetworkWired;
+  info = faCircleInfo;
 
   constructor(
     private escanearService: EscanearService,
-    public elementRef: ElementRef,
     private vulnerabilidadesService: VulnerabilidadesService,
+    private puertosService: PuertosService,
+    public elementRef: ElementRef,
     private modalService: NgbModal
   ) {
     this.formData = new FormData();
@@ -55,10 +63,13 @@ export class NmapComponent {
     this.escaneo = new EscaneoNmap([], []);
     this.escaneos = [];
     this.vulnerabilidades = new JsonVulneSolve("", 0, "", 0, []);
+    this.listaPuertos = [];
+    this.puertoDelModal = new Puerto(0, "", "");
   }
 
   ngOnInit() {
     this.buscarEscaneos();
+    this.buscarPuertos();
   }
 
   buscarEscaneos() : void {
@@ -66,6 +77,41 @@ export class NmapComponent {
       .subscribe(escaneos => {
         this.escaneos = escaneos;
       });
+  }
+
+  buscarPuertos() : void {
+    this.puertosService.obtenerPuertos()
+      .subscribe(puertos => {
+        this.listaPuertos = puertos;
+      });
+  }
+
+  estaElPuertoNumero(numero : number) {
+    for (let p of this.listaPuertos) {
+      if (p.numero === numero) {
+        return p;
+      }
+    }
+    return undefined;
+  }
+
+  estaElPuertoServicio(nombre : string) {
+    for (let p of this.listaPuertos) {
+      if (p.servicio === nombre) {
+        return p;
+      }
+    }
+    return undefined;
+  }
+
+  mostrarModalPuerto(content: TemplateRef<any>, puerto:Puerto) : void {
+    this.puertoDelModal = puerto;
+    this.modalService.open(content, {
+      size: 'lg',
+      scrollable: true,
+      centered: true,
+      backdropClass: 'light-blue'
+    });
   }
 
   compareEquipos(a : EquipoNmap, b : EquipoNmap) : number {

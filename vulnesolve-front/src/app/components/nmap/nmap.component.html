@@ -56,8 +56,22 @@
                       @for (puerto of equipo.puertos.sort(comparePuertos); track $index){
                         <div class="card text-center mb-2">
                           <div class="card-body">
-                            <h5 class="card-title">Puerto: {{puerto.numero}}</h5>
-                            <p class="card-text">Protocolo: {{puerto.nombre}}</p>
+                            <h5 class="card-title">
+                              Puerto: {{puerto.numero}}
+                              @if (estaElPuertoNumero(puerto.numero)){
+                                <button class="btn text-warning" (click)="mostrarModalPuerto(contentPuerto, estaElPuertoNumero(puerto.numero) || puertoDelModal)">
+                                  <fa-icon [icon]="info"></fa-icon>
+                                </button>
+                              }
+                            </h5>
+                            <p class="card-text">
+                              Servicio: {{puerto.nombre}}
+                              @if (estaElPuertoServicio(puerto.nombre)){
+                                <button class="btn text-warning" (click)="mostrarModalPuerto(contentPuerto, estaElPuertoServicio(puerto.nombre) || puertoDelModal)">
+                                  <fa-icon [icon]="info"></fa-icon>
+                                </button>
+                              }
+                            </p>
                             @if (puerto.descripcion.length > 0){<p class="card-text">Descripción: {{puerto.descripcion}}</p>}
                             <p class="card-text">Estado: {{puerto.estado}}</p>
                             @if (puerto.vulnerabilidades != null){
@@ -224,6 +238,17 @@
         [boundaryLinks]="true"
       />
     }
+  </div>
+</ng-template>
+
+<ng-template #contentPuerto let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Puerto {{puertoDelModal.numero}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <p>Servicio: {{puertoDelModal.servicio}}</p>
+    <p>Descripción: {{puertoDelModal.descripcion}}</p>
   </div>
 </ng-template>
 
