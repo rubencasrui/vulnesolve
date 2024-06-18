@@ -26,8 +26,8 @@ export class UsuariosService {
       this.esTokenExpirado(token)
         .subscribe({
           next: (respuesta) => {
-            this.sesionIniciada = !respuesta.expipirado;
-            if (respuesta.expipirado) {
+            this.sesionIniciada = !respuesta.expirado;
+            if (respuesta.expirado) {
               localStorage.removeItem('token');
               this.sesionIniciada = false;
               this.esUsuarioAdministrador = false;
@@ -69,7 +69,7 @@ export class UsuariosService {
   }
 
   esTokenExpirado(token : string) {
-    return this.http.get<{ expipirado:boolean }>(this.api + '/usuario/token-expirado/'+token);
+    return this.http.get<{ expirado:boolean }>(this.api + '/usuario/token-expirado/'+token);
   }
 
   esAdministrador(token : string) {
