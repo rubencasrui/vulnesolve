@@ -17,23 +17,23 @@ export class VulnerabilidadesService {
   ) { }
 
   vulnerabilidadesIndividual(busqueda : string) {
-    return this.http.get<JsonVulneSolve>(this.api + '/nve/vulnerabilidades/individual/'+busqueda);
+    return this.http.get<JsonVulneSolve>(this.api + '/nvd/vulnerabilidades/individual/'+busqueda);
   }
 
   vulnerabilidadesMultiples(busqueda : string) {
-    return this.http.get<JsonVulneSolve>(this.api + '/nve/vulnerabilidades/multiple/'+busqueda);
+    return this.http.get<JsonVulneSolve>(this.api + '/nvd/vulnerabilidades/multiple/'+busqueda);
   }
 
   cantidadVulnerabilidades(busqueda : string) {
-    return this.http.get<TotalResults>(this.api + '/nve/estadisticas/vulnerabilidades/'+busqueda);
+    return this.http.get<TotalResults>(this.api + '/nvd/estadisticas/vulnerabilidades/'+busqueda);
   }
 
   vulnerabilidadesVersion2() {
-    return this.http.get<Estadistica[]>(this.api + '/nve/estadisticas/severidad/v2');
+    return this.http.get<Estadistica[]>(this.api + '/nvd/estadisticas/severidad/v2');
   }
 
   vulnerabilidadesVersion3() {
-    return this.http.get<Estadistica[]>(this.api + '/nve/estadisticas/severidad/v3');
+    return this.http.get<Estadistica[]>(this.api + '/nvd/estadisticas/severidad/v3');
   }
 
 }
